@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>Meal Page</title>
+</head>
+<body>
+
+    <div id="meal-container"></div>
+
+    <script>
+        
+        document.addEventListener("DOMContentLoaded", function() {
+
+            var ricerca = getQueryParam("idMeal");
+            console.log(ricerca);
+
+            if (ricerca) {
+
+                getDetailMealList(ricerca)
+
+            } else {
+                // Errore
+            }
+    
+});
+    </script>
+    
+</body>
+</html>
