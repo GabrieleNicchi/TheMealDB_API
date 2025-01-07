@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>Meal Page</title>
+</head>
+<body>
+
+    <h1> $execute </h1>
+    <div id="meal-container"></div>
+
+    <script>
+
+        var execute
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            // Ottieni il parametro 'meal' dalla URL
+
+            var name_param = getQueryParamNames();
+            //console.log(name_param);
+            var ricerca = getQueryParam(name_param);
+            //console.log(ricerca);
+
+            if(name_param == "meal")
+                execute = "Ricerca per nome della ricetta:"
+            else if(name_param == "ingredient")
+                execute = "Ricerca per ingrediente:"
+            else if(name_param == "letter")
+                execute = "Ricerca per lettera iniziale:"
+
+            //Gestione separata in base al form di input
+            if (ricerca) {
+                //Caso invio il nome della ricetta
+                if(name_param == "meal"){
+                    fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=' + ricerca)
+                    .then(response => response.json())
+                    .then(data => {
+                    const mealContainer = document.getElementById('meal-container');
+                    
+                    // Cancella il contenuto precedente una sola volta, prima del ciclo
+                    mealContainer.innerHTML = '';
+
+                    // Se ci sono pasti trovati
+                    if (data.meals) {
+                        
+                        printMeal(data.meals , mealContainer);
+                        
+                    } else {
+                        // Se nessun pasto viene trovato
+                        mealContainer.innerHTML = '<p>No meal found.</p>';
+                    }
+                }).catch(error => console.error('Error fetching meal data:', error));
+                //Caso invio il nome dell'ingrediente della ricetta
+                } else if (name_param == "ingredient"){
+                    fetch('https://www.themealdb.com/api/json/v1/1/filter.php?i=' + ricerca)
+                    .then(response => response.json())
+                    .then(data => {
+                    const mealContainer = document.getElementById('meal-container');
+                    
+                    // Cancella il contenuto precedente una sola volta, prima del ciclo
+                    mealContainer.innerHTML = '';
+
+                    // Se ci sono pasti trovati
+                    if (data.meals) {
+                        
+                        printMeal(data.meals , mealContainer);
+                        
+                    } else {
+                        // Se nessun pasto viene trovato
+                        mealContainer.innerHTML = '<p>No meal found.</p>';
+                    }
+                }).catch(error => console.error('Error fetching meal data:', error));
+                
+                } else if (name_param == "letter") {
+                    fetch('https://www.themealdb.com/api/json/v1/1/search.php?f=' + ricerca)
+                .then(response => response.json())
+                .then(data => {
+                    const mealContainer = document.getElementById('meal-container');
+                    
+                    // Cancella il contenuto precedente una sola volta, prima del ciclo
+                    mealContainer.innerHTML = '';
+
+                    // Se ci sono pasti trovati
+                    if (data.meals) {
+                        
+                        printMeal(data.meals , mealContainer);
+                        
+                    } else {
+                        // Se nessun pasto viene trovato
+                        mealContainer.innerHTML = '<p>No meal found.</p>';
+                    }
+                }).catch(error => console.error('Error fetching meal data:', error));
+                }
+                
+            }
+});
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>Meal Page</title>
+</head>
+<body>
+    <h1>Ricerca per lettera iniziale dell'ingrediente: </h1>
+    <div id="meal-container"></div>
+
+    <script>
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            // Ottieni il parametro 'meal' dalla URL
+            var ricerca = getQueryParam('lettera');
+            console.log(ricerca);
+
+            if (ricerca) {
+                fetch('https://www.themealdb.com/api/json/v1/1/search.php?f=' + ricerca)
+                .then(response => response.json())
+                .then(data => {
+                    const mealContainer = document.getElementById('meal-container');
+                    
+                    // Cancella il contenuto precedente una sola volta, prima del ciclo
+                    mealContainer.innerHTML = '';
+
+                    // Se ci sono pasti trovati
+                    if (data.meals) {
+                        
+                        printMeal(data.meals , mealContainer);
+                        
+                    } else {
+                        // Se nessun pasto viene trovato
+                        mealContainer.innerHTML = '<p>No meal found.</p>';
+                    }
+                })
+                .catch(error => console.error('Error fetching meal data:', error));
+            }
+});
+    </script>
+    
+</body>
+</html>

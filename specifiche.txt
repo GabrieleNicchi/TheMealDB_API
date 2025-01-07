@@ -1,0 +1,11 @@
+Index.html
+    --> Per ora autoesplicativo... section di ricerca che implementa un campo di testo e un pulsante, il pulsante porta alla pagina 'elenco_meal.html'
+        passando come parametro "meal" l'input all'interno del form
+
+elenco_meal.html
+    --> Prende l'input inserito nel campo di testo in 'index.html' ed effettua la richiesta API con il fetch, passando come parametro l'input.
+        Gestisce i vari casi attraverso la funzione getQueryParamNames() , che restituisce da "dove" arriva la richiesta (catturando i vari casi: 
+        meal, ingredient, letter, ...). Salvandolo nel parametro 'name_param' , a questo punto gestisco i casi passando tale parametro alla
+        funzione getQueryParam() che catturerà il valore effettivo (ad es. il nome del piatto). 
+        L'inserimento del piatto è gestita dalla funzione printMeal(). 
+        Il risultato è inserito nel div meal-container
