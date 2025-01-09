@@ -11,123 +11,133 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="style.css">
 	<script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
+    <script src="script.js"></script>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-<ul class="menu">
-
-    <!-- Logo -->
-    <li>
-        <img src="img/logo.png" alt="" >
-    </li>
-
-    <!-- Home -->
-	<li><a href="#"><button type="button" class="btn btn-light">
-        Home<img src="img/house-fill.svg" alt="Icona lista" width="24" height="24">
-    </button></a>
-    </li>
-
-    <!-- Filtro -->
-    <li>
-        <button type="button" id="openOverlay" class="btn btn-light">
-            Filtra <img src="img/funnel-fill.svg" alt="Icona lista" width="24" height="24">
-        </button>
-    </li>
-
-        
-    <!-- Barra di ricerca -->
-	<li><form method="GET" action="elenco_meal.html" onsubmit="return checkFormMeal()" class="w-100">
-        <div class="input-group">
-            <input type="text" id="searchInputMeal" placeholder="cerca una ricetta..." name="meal" class="form-control">
-            <button id="searchButtonMeal" class="btn btn-outline-dark" type="submit">Cerca</button>
-        </div>
-    </form>
-    </li>
-
-    <!-- Registrazione / mostra utente -->
-    <li class="register"><a href=""><button type="button" class="btn btn-light">
-        Registrati<img src="img/door-open-fill.svg" alt="Icona lista" width="24" height="24">
-    </button></a>
-    </li>
-</ul>
-</div>
-
-<!-- Hero -->
-<div class="hero">
-	<div class="hero__content reveal">
-	<p class="intro-text">Intro text</p>
-	<h1 class="big-text">Progetto applicazione web</h1>
-	<!--<a href="" class="button">Discover More</a>-->
-</div>
-<video autoplay muted loop id="video-back">
-<source src="img/video-back.mp4" type="video/mp4">
-</video>
-</div>
-
-<!-- Overlay -->
-<div id="overlay">
-    <div class="content">
-
-        <!-- Filtra per ingrediente -->
-        <form method="GET" action="elenco_meal.html" onsubmit="return checkFormMeal()" class="w-100">
-            <label for="filtra_ingrediente">Filtra per ingrediente: </label>
-                <input type="text" id="searchInputMeal" placeholder="cerca un ingrediente..." name="ingredient" class="form-control">
-                <button id="searchButtonIngredients" class="btn btn-outline-dark" type="submit">Cerca</button>
+    <!-- HEADER -->
+    <div class="header">
+    <ul class="menu">
+    
+        <!-- Logo -->
+        <li>
+            <img src="img/logo.png" alt="" >
+        </li>
+    
+        <!-- Home -->
+        <li><a href="#"><button type="button" class="btn btn-light">
+            Home<img src="img/house-fill.svg" alt="Icona lista" width="24" height="24">
+        </button></a>
+        </li>
+    
+        <!-- Filtro -->
+        <li>
+            <button type="button" id="openOverlay" class="btn btn-light">
+                Filtra <img src="img/funnel-fill.svg" alt="Icona lista" width="24" height="24">
+            </button>
+        </li>
+    
+            
+        <!-- Barra di ricerca -->
+        <li><form method="GET" action="elenco_meal.html" onsubmit="return checkFormMeal()" class="w-100">
+            <div class="input-group">
+                <input type="text" id="searchInputMeal" placeholder="cerca una ricetta..." name="meal" class="form-control">
+                <button id="searchButtonMeal" class="btn btn-outline-dark" type="submit">Cerca</button>
+            </div>
         </form>
-
-        <!-- Filtra per lettera -->
-        <form method="GET" action="elenco_meal.html" onsubit="" class="w-100">
-            <label for="filtra_lettera">Filtra per lettera: </label>
-            <select name="letter">
-                <option value="">Seleziona una lettera</option>
-                <!-- Aggiungere tutte le lettere dell'alfabeto -->
-                <option value="a">A</option>
-                <option value="b">B</option>
-                <option value="c">C</option>
-                <option value="d">D</option>
-                <option value="e">E</option>
-                <option value="f">F</option>
-                <option value="g">G</option>
-                <option value="h">H</option>
-                <option value="i">I</option>
-                <option value="j">J</option>
-                <option value="k">K</option>
-                <option value="l">L</option>
-                <option value="m">M</option>
-                <option value="n">N</option>
-                <option value="o">O</option>
-                <option value="p">P</option>
-                <option value="q">Q</option>
-                <option value="r">R</option>
-                <option value="s">S</option>
-                <option value="t">T</option>
-                <option value="u">U</option>
-                <option value="v">V</option>
-                <option value="w">W</option>
-                <option value="x">X</option>
-                <option value="y">Y</option>
-                <option value="z">Z</option>
-            </select>
-            <button id="searchButtonLetter" class="btn btn-outline-dark" type="submit">Cerca</button>
-        </form>
-            <button id="closeOverlay">Chiudi</button>
-        </form>
+        </li>
+    
+        <!-- Registrazione / mostra utente -->
+        <li class="register" id="user-info">
+            <!-- Questo elemento verrà aggiornato dinamicamente -->
+        </li>
+    </ul>
     </div>
-</div>
+    
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero__content reveal">
+        <p class="intro-text">Intro text</p>
+        <h1 class="big-text">Progetto applicazione web</h1>
+        <!--<a href="" class="button">Discover More</a>-->
+    </div>
+    <video autoplay muted loop id="video-back">
+    <source src="img/video-back.mp4" type="video/mp4">
+    </video>
+    </div>
+    
+    <!-- Overlay -->
+    <div id="overlay">
+        <div class="content">
+    
+            <!-- Filtra per ingrediente -->
+            <form method="GET" action="elenco_meal.html" onsubmit="return checkFormMeal()" class="w-100">
+                <label for="filtra_ingrediente">Filtra per ingrediente: </label>
+                    <input type="text" id="searchInputMeal" placeholder="cerca un ingrediente..." name="ingredient" class="form-control">
+                    <button id="searchButtonIngredients" class="btn btn-outline-dark" type="submit">Cerca</button>
+            </form>
+    
+            <!-- Filtra per lettera -->
+            <form method="GET" action="elenco_meal.html" onsubmit="" class="w-100">
+                <label for="filtra_lettera">Filtra per lettera: </label>
+                <select name="letter">
+                    <option value="">Seleziona una lettera</option>
+                    <!-- Aggiungere tutte le lettere dell'alfabeto -->
+                    <option value="a">A</option>
+                    <option value="b">B</option>
+                    <option value="c">C</option>
+                    <option value="d">D</option>
+                    <option value="e">E</option>
+                    <option value="f">F</option>
+                    <option value="g">G</option>
+                    <option value="h">H</option>
+                    <option value="i">I</option>
+                    <option value="j">J</option>
+                    <option value="k">K</option>
+                    <option value="l">L</option>
+                    <option value="m">M</option>
+                    <option value="n">N</option>
+                    <option value="o">O</option>
+                    <option value="p">P</option>
+                    <option value="q">Q</option>
+                    <option value="r">R</option>
+                    <option value="s">S</option>
+                    <option value="t">T</option>
+                    <option value="u">U</option>
+                    <option value="v">V</option>
+                    <option value="w">W</option>
+                    <option value="x">X</option>
+                    <option value="y">Y</option>
+                    <option value="z">Z</option>
+                </select>
+                <button id="searchButtonLetter" class="btn btn-outline-dark" type="submit">Cerca</button>
+            </form>
+                <button id="closeOverlay">Chiudi</button>
+        </div>
+    </div>
 
 
 
 <script>
     document.getElementById('openOverlay').addEventListener('click', function() {
-        document.getElementById('overlay').style.display = 'flex';
-    });
+        document.getElementById('overlay').style.display = 'flex'
+    })
     
     document.getElementById('closeOverlay').addEventListener('click', function() {
-        document.getElementById('overlay').style.display = 'none';
-    });
+        document.getElementById('overlay').style.display = 'none'
+    })
+
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchAndStoreMealsByIdRange(52764, 53085).then(() => {
+            console.log('Dati scaricati e memorizzati con successo.')
+        }).catch(error => {
+            console.error('Errore durante il download dei dati:', error)
+        })
+
+        checkUserLogged()
+
+    })
     
 </script>
 
@@ -138,11 +148,11 @@
 	$( document ).ready(function(){
 	/* Aprire pannello */
 	$(".hamburger").on('click', function(){
-	$(".menu").toggleClass("menu--open");});
+	$(".menu").toggleClass("menu--open")})
 	});
 
-	ScrollReveal().reveal('.reveal', {distance: '100px', duration: 1500 , easing: 'cubic-bezier(.215, .61, .355, 1)' , interval: 600});
-	ScrollReveal().reveal('.zoom', {duration: 1500 , easing: 'cubic-bezier(.215, .61, .355, 1)' , interval: 200 , scale: 0.65 , mobile: false});
+	ScrollReveal().reveal('.reveal', {distance: '100px', duration: 1500 , easing: 'cubic-bezier(.215, .61, .355, 1)' , interval: 600})
+	ScrollReveal().reveal('.zoom', {duration: 1500 , easing: 'cubic-bezier(.215, .61, .355, 1)' , interval: 200 , scale: 0.65 , mobile: false})
 </script>
 
 </body>

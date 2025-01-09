@@ -1,13 +1,2 @@
 
 !! GITTA !!
-
-
-- Se non inserisci nulla nel campo di testo e premi invio non stampa errore --> prova a capire come mai
-  (probabilmente la devi controllare con il checkform())
-
-- Idex.html richiama la funzione checkform() , per ora non esiste , da implementare
-
-- Logica del checkFormMeal() da sistemare mongol!!!!!!!!!!! (index.html)
-  <div id="errorMessageMeal"></div>
-
-- l'id "searchinputmeal" valido per tutti , non ha alcun senso

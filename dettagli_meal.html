@@ -15,9 +15,19 @@
         
         document.addEventListener("DOMContentLoaded", function() {
 
-            var ricerca = getQueryParam("idMeal");
-            console.log(ricerca);
+            var ricerca = getQueryParam("idMeal")
+            //console.log(ricerca)
 
+            // Dettagli (LOCALE)
+
+            if(ricerca){
+                getMealDetailStore(ricerca)
+            } else {
+                //Errore
+            }
+
+            // Dettagli (API)
+            /*
             if (ricerca) {
 
                 getDetailMealList(ricerca)
@@ -25,8 +35,9 @@
             } else {
                 // Errore
             }
+            */
     
-}); //GIT
+        })
     </script>
     
 </body>
