@@ -9,18 +9,57 @@
 </head>
 <body>
 
+    <!-- HEADER -->
+    <div class="header">
+        <ul class="menu">
+        
+            <!-- Logo -->
+            <li>
+                <img src="img/logo.png" alt="" >
+            </li>
+        
+            <!-- Home -->
+            <li><a href="#"><button type="button" class="btn btn-light">
+                Home<img src="img/house-fill.svg" alt="Icona home" width="24" height="24">
+            </button></a>
+            </li>
+        
+            <!-- Filtro -->
+            <li>
+                <button type="button" id="openOverlay" class="btn btn-light">
+                    Filtra <img src="img/funnel-fill.svg" alt="Icona filtra" width="24" height="24">
+                </button>
+            </li>
+        
+                
+            <!-- Barra di ricerca -->
+            <li><form method="GET" action="elenco_meal.html" onsubmit="return checkFormMeal()" class="w-100">
+                <div class="input-group">
+                    <input type="text" id="searchInputMeal" placeholder="cerca una ricetta..." name="meal" class="form-control">
+                    <button id="searchButtonMeal" class="btn btn-outline-dark" type="submit">Cerca</button>
+                </div>
+            </form>
+            </li>
+        
+            <!-- Registrazione / mostra utente -->
+            <li class="register" id="user-info">
+                <!-- Questo elemento verrà aggiornato dinamicamente -->
+            </li>
+        </ul>
+        </div>
+
     <h1 id="execute"></h1>
     <div id="meal-container"></div>
 
     <script>
         // per aggiornare dinamicamente l'info sull'output
-        var execute;
+        var execute
     
         document.addEventListener("DOMContentLoaded", function() {
             // Ottieni il parametro 'meal' dalla URL
-            var name_param = getQueryParamNames();
+            var name_param = getQueryParamNames()
             //console.log(name_param);
-            var ricerca = getQueryParam(name_param);
+            var ricerca = getQueryParam(name_param)
             //console.log(ricerca);
     
             // logica execute

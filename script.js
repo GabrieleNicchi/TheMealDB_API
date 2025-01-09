@@ -22,18 +22,18 @@ const getQueryParamNames = () => {
 /* ------------------------------ WEB STORAGE ------------------------------ */
 
 const fetchAndStoreMealsByIdRange = async (startId, endId) => {
-    let allMeals = [];
+    let allMeals = []
 
     for (let id = startId; id <= endId; id++) {
 
         // Controlla se i dati sono già presenti nel LocalStorage
         if (localStorage.getItem('meals')) {
-            console.log('I dati sono già presenti nel LocalStorage.');
-            return;
+            console.log('I dati sono già presenti nel LocalStorage.')
+            return
         }
 
         try {
-            const response = await fetch('https://www.themealdb.com/api/json/v1/1/lookup.php?i=' + id);
+            const response = await fetch('https://www.themealdb.com/api/json/v1/1/lookup.php?i=' + id)
             const data = await response.json()
             if (data.meals) {
                 console.log("data meal: ", data.meals)
@@ -143,23 +143,32 @@ const getMealList = ( ricerca , mealContainer , type, ref) => {
 }
 */
 // Funzione di stampa dei pasti
-const printMeal = (data_meal , mealContainer) => {
-   
+const printMeal = (data_meal, mealContainer) => {
+
     for (var i = 0; i < data_meal.length; i++) {
         const meal = data_meal[i]
+
+        const prefs = checkFavoriteMeal(meal)
         
         // Crea l'elemento per ogni pasto
-        const mealElement = document.createElement('div');
+        const mealElement = document.createElement('div')
         mealElement.classList.add('meal')
         
         // Inserisci il div nella pagina
-        // Quando l'utente clicca su 'Dettagli' passa l'id del piatto selezionato
         mealElement.innerHTML = `
             <h2>${meal.strMeal}</h2>
             <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
-            <p><a href="dettagli_meal.html?idMeal=${meal.idMeal}">Dettagli</a></p>
-        `;
+            <p>
+                <a href="dettagli_meal.html?idMeal=${meal.idMeal}">Dettagli</a>
+                <button class="btn btn-light fav-button">
+                    <img src="img/${prefs ? 'heart-fill' : 'heart'}.svg" alt="Icona preferiti" width="30" height="30">
+                </button>
+            </p>
+        `
         
+        // Aggiungi l'event listener al bottone dei preferiti
+        mealElement.querySelector('.fav-button').addEventListener('click', () => updateFavMeal(meal, mealElement.querySelector('.fav-button')))
+
         // Aggiungi ogni pasto al contenitore
         mealContainer.appendChild(mealElement)
     }
@@ -196,17 +205,32 @@ const getDetailMealList = ( id ) => {
 const printDetailMeal = (meal, mealContainer) => {
     // Crea l'elemento per ogni pasto
     const mealElement = document.createElement('div')
-    mealElement.classList.add('meal')
+    mealElement.classList.add('meal-detail')
+
+    const prefs = checkFavoriteMeal(meal)
 
     // Inserisci il div nella pagina
     mealElement.innerHTML = `
         <h1>${meal.strMeal}</h1>
+        <button class="btn btn-light fav-button">
+            <img src="img/${prefs ? 'heart-fill' : 'heart'}.svg" alt="Icona preferiti" width="30" height="30">
+        </button>
         <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
         <p><h3>Categoria:</h3> ${meal.strCategory}</p>
         <p><h3>Area:</h3> ${meal.strArea}</p>
         <p><h3>Istruzioni:</h3> ${meal.strInstructions}</p>
         <div id="ingredients">${append_ingredients(meal)}</div>
+        <div id="review">${printReview(meal.idMeal)}</div>
     `
+
+    // Aggiungi l'event listener al bottone dei preferiti
+    mealElement.querySelector('.fav-button').addEventListener('click', () => updateFavMeal(meal, mealElement.querySelector('.fav-button')))
+
+    // Aggiungi l'event listener al bottone delle recensioni
+    mealElement.querySelector('.review-button').addEventListener('click', () => {
+        const reviewContainer = mealElement.querySelector(`#reviewContainer-${meal.idMeal}`)
+        reviewContainer.style.display = reviewContainer.style.display === 'none' ? 'block' : 'none'
+    })
 
     // Aggiungi ogni pasto al contenitore
     mealContainer.appendChild(mealElement)
@@ -226,6 +250,204 @@ const append_ingredients = (meal) => {
     ingredientsHTML += "</ul>"
     return ingredientsHTML
 }
+
+/* ------------------------------ RICETTARIO ------------------------------ */
+
+const checkFavoriteMeal = (meal) => {
+
+    // Recupera l'utente loggato dal session storage
+    const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+
+    if(!utenteLoggato){
+        return
+    }
+
+    // Verifica se il pasto è tra i preferiti
+    return utenteLoggato.pastiPreferiti.some(p => p.id === meal.idMeal)
+
+}
+
+const updateFavMeal = (meal, button) => {
+
+    // Recupera l'utente loggato dal session storage
+    const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+
+    if (!utenteLoggato) {
+        alert("Perfavore, effettua il login per vedere i tuoi pasti preferiti")
+        window.location.href = 'login.html'
+        return
+    }
+
+    // Controlla se il piatto era tra i preferiti
+    const isFavorite = checkFavoriteMeal(meal)
+
+    if (isFavorite) {
+        // Rimuovi il pasto dai preferiti
+        utenteLoggato.pastiPreferiti = utenteLoggato.pastiPreferiti.filter(p => p.id !== meal.idMeal)
+        button.querySelector('img').src = 'img/heart.svg'; // Cambia l'icona
+    } else {
+        // Aggiungi il pasto ai preferiti
+        utenteLoggato.pastiPreferiti.push({ id: meal.idMeal, commento: '' })
+        button.querySelector('img').src = 'img/heart-fill.svg' // Cambia l'icona
+    }
+
+    // Aggiorna il session storage
+    sessionStorage.setItem('utenteLoggato', JSON.stringify(utenteLoggato))
+
+    // Aggiorna il local storage
+    const utenti = JSON.parse(localStorage.getItem('utenti')) || []
+    const utenteIndex = utenti.findIndex(u => u.email === utenteLoggato.email)
+
+    if (utenteIndex !== -1) {
+        utenti[utenteIndex].pastiPreferiti = utenteLoggato.pastiPreferiti
+        localStorage.setItem('utenti', JSON.stringify(utenti))
+    }
+}
+
+const saveNote = (idMeal, commento) => {
+    const utenteLoggatoData = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+
+    // Crea un'istanza della classe Utente
+    const utenteLoggato = new Utente(
+        utenteLoggatoData.username,
+        utenteLoggatoData.email,
+        utenteLoggatoData.password,
+        utenteLoggatoData.paese,
+        utenteLoggatoData.categoria
+    )
+
+    // Aggiungi i pasti preferiti esistenti all'istanza dell'utente
+    utenteLoggatoData.pastiPreferiti.forEach(pasto => {
+        utenteLoggato.aggiungiPastoPreferito(pasto.id, pasto.commento)
+    })
+
+    
+    //console.log('Pasti preferiti:', utenteLoggato.pastiPreferiti)
+    const pasto = utenteLoggato.pastiPreferiti.find(p => p.id === idMeal.toString())
+    if (!pasto) {
+        console.error(`Pasto con ID ${idMeal} non trovato nei pasti preferiti.`)
+        return
+    }
+
+    // Aggiungi o aggiorna il commento
+    utenteLoggato.aggiungiCommento(idMeal.toString(), commento)
+
+    // Aggiorna il session storage
+    sessionStorage.setItem('utenteLoggato', JSON.stringify(utenteLoggato))
+
+    // Aggiorna il local storage
+    const utenti = JSON.parse(localStorage.getItem('utenti')) || []
+    const utenteIndex = utenti.findIndex(u => u.email === utenteLoggato.email)
+
+    if (utenteIndex !== -1) {
+        utenti[utenteIndex].pastiPreferiti = utenteLoggato.pastiPreferiti
+        localStorage.setItem('utenti', JSON.stringify(utenti))
+    }
+
+    // Aggiorna la visualizzazione della nota
+    const noteContainer = document.querySelector(`#noteContainer-${idMeal}`)
+    noteContainer.innerHTML = `
+        <p>${commento}</p>
+        <button class="btn btn-light edit-note-button" onclick="editNote(${idMeal}, '${commento}')">Modifica Nota</button>
+    `
+}
+
+const editNote = (idMeal, commento) => {
+    const noteContainer = document.querySelector(`#noteContainer-${idMeal}`)
+    noteContainer.innerHTML = `
+        <textarea id='noteText-${idMeal}' rows='4' cols='50' placeholder='Scrivi la tua nota qui...'>${commento}</textarea><br>
+        <button class="btn btn-light" onclick="saveNote(${idMeal}, document.getElementById('noteText-${idMeal}').value)">Salva Nota</button>
+    `
+}
+
+const getFavMeal = () => {
+
+    // Recupera l'utente loggato dal session storage
+    const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+    const mealContainer = document.getElementById('meal-container')
+
+    // Se l'utente non ha salvato alcun piatto
+    // TODO() ********** SISTEMA
+    if(utenteLoggato.pastiPreferiti.length == 0){
+        // Crea l'elemento per ogni pasto
+        const mealElement = document.createElement('div')
+        mealElement.classList.add('meal')
+        
+        // Inserisci il div nella pagina
+        mealElement.innerHTML = `
+            <h2> Nessun piatto tra i preferiti :( </h2>
+        `
+        // Aggiungi ogni pasto al contenitore
+        mealContainer.appendChild(mealElement)
+    }
+
+    // Recupera tutti i pasti dal local storage
+    const meals = JSON.parse(localStorage.getItem('meals'))
+    let dataMeals = []
+
+    // Itera sui pasti preferiti dell'utente
+    for (let i = 0; i < utenteLoggato.pastiPreferiti.length; i++) {
+        const id = utenteLoggato.pastiPreferiti[i].id
+        // Cerca per ID del pasto
+        const meal = meals.find(meal => meal.idMeal === id)
+        if (meal) {
+            dataMeals.push(meal)
+        }
+    }
+
+    // Stampa i pasti preferiti
+    printMealPrefs(dataMeals, mealContainer )
+}
+
+// Funzione dei pasti preferiti del ricettario
+const printMealPrefs = (data_meal, mealContainer) => {
+
+    for (var i = 0; i < data_meal.length; i++) {
+        const meal = data_meal[i]
+        const prefs = checkFavoriteMeal(meal)
+        const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+        const pastoPreferito = utenteLoggato.pastiPreferiti.find(p => p.id === meal.idMeal)
+        const commento = pastoPreferito ? pastoPreferito.commento : ''
+
+        // Crea l'elemento per ogni pasto
+        const mealElement = document.createElement('div')
+        mealElement.classList.add('meal')
+        
+        // Inserisci il div nella pagina
+        mealElement.innerHTML = `
+            <h2>${meal.strMeal}</h2>
+            <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+            <p>
+                <a href="dettagli_meal.html?idMeal=${meal.idMeal}">Dettagli</a>
+                <button class="btn btn-light note-button">Mostra/Nascondi Nota</button>
+                <div id='noteContainer-${meal.idMeal}' style='display:none;'>
+                    ${commento ? 
+                        `<p>${commento}</p><button class="btn btn-light edit-note-button" onclick="editNote(${meal.idMeal}, '${commento}')">Modifica Nota</button>` 
+                        : 
+                        `<textarea id='noteText-${meal.idMeal}' rows='4' cols='50' placeholder='Scrivi la tua nota qui...'></textarea><br><button class="btn btn-light" onclick="saveNote(${meal.idMeal}, document.getElementById('noteText-${meal.idMeal}').value)">Salva Nota</button>`
+                    }
+                </div>
+                <button class="btn btn-light fav-button">
+                    <img src="img/${prefs ? 'heart-fill' : 'heart'}.svg" alt="Icona preferiti" width="30" height="30">
+                </button>
+            </p>
+        `
+        
+        // Aggiungi l'event listener al bottone dei preferiti
+        mealElement.querySelector('.fav-button').addEventListener('click', () => updateFavMeal(meal, mealElement.querySelector('.fav-button')))
+
+        // Aggiungi l'event listener al bottone delle note
+        mealElement.querySelector('.note-button').addEventListener('click', () => {
+            const noteContainer = mealElement.querySelector(`#noteContainer-${meal.idMeal}`)
+            noteContainer.style.display = noteContainer.style.display === 'none' ? 'block' : 'none'
+        })
+
+        // Aggiungi ogni pasto al contenitore
+        mealContainer.appendChild(mealElement);
+    }
+}
+
+
 
 /* ------------------------------ PROFILO UTENTE ------------------------------ */
 
@@ -317,18 +539,131 @@ const checkUserLogged = () => {
      const userInfoElement = document.getElementById('user-info')
 
      if (utenteLoggato) {
-         // Mostra il nome utente e l'immagine
-         userInfoElement.innerHTML = `
-             <a href=""><button type="button" class="btn btn-light">
-                ${utenteLoggato.username}<img src="img/person-workspace.svg" alt="Icona utente" width="24" height="24">
-             </button></a>
-         `
+        // Mostra il nome utente e il menu a tendina
+        userInfoElement.innerHTML = `
+            <div class="dropdown">
+                <button class="btn btn-light dropbtn">
+                    <img src="img/person-workspace.svg" alt="Icona utente" width="44" height="24">
+                </button>
+                <div class="dropdown-content">
+                    <span class="dropdown-span normal-text">${utenteLoggato.username}</span>
+                    <span class="small-text">
+                        <a href="preferiti.html"><img src="img/person-heart.svg" alt="Icona preferiti" width="24" height="24"> Ricettario</a>
+                    </span>
+                    <span class="small-text">
+                        <a href="modifica_profilo.html"><img src="img/person-fill-gear.svg" alt="Icona modifica profilo" width="24" height="24">Modifica profilo</a>
+                    </span>
+                    <span class="small-text">
+                        <a href="#" id="logout-button"><img src="img/door-closed-fill.svg" alt="Icona logout" width="24" height="24">Logout</a>
+                    </span>
+                </div>
+            </div>
+        `
+
+        // Aggiungi l'evento di click al pulsante di logout
+        document.getElementById('logout-button').addEventListener('click', function() {
+            sessionStorage.removeItem('utenteLoggato')
+            window.location.href = 'index.html'
+        });
      } else {
          // Mostra la scritta "Accedi" e l'immagine
          userInfoElement.innerHTML = `
-             <a href="login.html"><button type="button" class="btn btn-light">
+             <a href="login.html"><button type="button" class="btn btn-light" style="padding-right:50px">
                  Accedi <img src="img/door-open-fill.svg" alt="Icona lista" width="24" height="24">
              </button></a>
          `
      }
+}
+
+/* ------------------------------ Recensioni ------------------------------ */
+
+class Recensione{
+    constructor(idPasto) {
+        this.idPasto = idPasto
+        this.valutazione = []
+    }
+
+    // Metodo per aggiungere una nuova valutazione ad un piatto
+    aggiungiValutazione(utente, rank, commento) {
+        const valutazione = new Valutazione(utente, rank, commento)
+        this.valutazione.push(valutazione)
+    }
+}
+class Valutazione{
+
+    constructor(utente, rank, commento){
+
+        this.utente = utente
+        this.rank = rank
+        this.commento = commento
+
+    }
+}
+
+const printReview = (id) => {
+    // Prendi le recensioni dal Local Storage
+    const recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+    let recensione = recensioni.find(review => review.idPasto === id)
+
+    let recensioneHtml = "";
+
+    if (recensione && recensione.valutazione.length > 0) {
+        recensione.valutazione.forEach(valutazione => {
+            recensioneHtml += `
+                <p>Utente: ${valutazione.utente}</p>
+                <p>Valutazione: ${valutazione.rank}</p>
+                <p>Commento: ${valutazione.commento}</p>
+                <hr>
+            `
+        })
+    } else {
+        recensioneHtml = "Ancora nessuna recensione."
+    }
+
+    recensioneHtml += `
+        <button class="btn btn-light review-button">Lascia una recensione</button>
+        <div id="reviewContainer-${id}" style="display:none;">
+            <textarea id="reviewText-${id}" rows="4" cols="50" placeholder="Scrivi la tua recensione qui..."></textarea><br>
+            <input type="number" id="reviewRank-${id}" min="1" max="5" placeholder="Valutazione (1-5)">
+            <button class="btn btn-light" onclick="placeReview(${id})">Invia Recensione</button>
+        </div>
+    `
+
+    return recensioneHtml
+}
+
+const placeReview = (idMeal) => {
+
+    const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+    if (!utenteLoggato) {
+        alert("Perfavore, effettua il login per lasciare una recensione")
+        window.location.href = 'login.html'
+        return
+    }
+
+    const commento = document.getElementById(`reviewText-${idMeal}`).value
+    const rank = document.getElementById(`reviewRank-${idMeal}`).value
+
+    if (!commento || !rank) {
+        alert("Perfavore, inserisci sia una valutazione che un commento")
+        return
+    }
+
+    // Prendi le recensioni dal Local Storage
+    const recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+    let recensione = recensioni.find(review => review.idPasto === idMeal)
+
+    if (!recensione) {
+        recensione = new Recensione(idMeal)
+        recensioni.push(recensione)
+    }
+
+    recensione.aggiungiValutazione(utenteLoggato.username, rank, commento)
+
+    // Aggiorna il local storage
+    localStorage.setItem('recensioni', JSON.stringify(recensioni))
+
+    // Aggiorna la visualizzazione delle recensioni
+    document.getElementById(`reviewContainer-${idMeal}`).style.display = 'none'
+    document.getElementById('review').innerHTML = printReview(idMeal)
 }
