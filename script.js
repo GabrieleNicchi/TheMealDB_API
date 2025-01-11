@@ -227,11 +227,28 @@ const printDetailMeal = (meal, mealContainer) => {
     // Aggiungi l'event listener al bottone dei preferiti
     mealElement.querySelector('.fav-button').addEventListener('click', () => updateFavMeal(meal, mealElement.querySelector('.fav-button')))
 
-    // Aggiungi l'event listener al bottone delle recensioni
-    mealElement.querySelector('.review-button').addEventListener('click', () => {
-        document.getElementById('review-overlay').style.display = 'flex'
-        document.getElementById('submit-review').onclick = () => placeReview(meal.idMeal)
-    })
+    // Controllo se l'utente ha già effettuato una recensione
+    // 'false' ->  placeReview()
+    const hasReviewed = hasUserLeftReview(meal.idMeal)
+
+    if(hasReviewed){
+
+        // Aggiungi l'event listener al bottone delle recensioni
+        mealElement.querySelector('.review-button').addEventListener('click', () => {
+            document.getElementById('review-overlay').style.display = 'flex'
+            document.getElementById('submit-review').onclick = () => editReview(meal.idMeal)
+        })
+
+    } else {
+
+        // Aggiungi l'event listener al bottone delle recensioni
+        mealElement.querySelector('.review-button').addEventListener('click', () => {
+            document.getElementById('review-overlay').style.display = 'flex'
+            document.getElementById('submit-review').onclick = () => placeReview(meal.idMeal)
+        })
+
+    }
+    
 
     // Chiudi l'overlay
     document.getElementById('close-overlay').addEventListener('click', () => {
@@ -594,6 +611,17 @@ class Recensione{
         const valutazione = new Valutazione(utente, rank, commento)
         this.valutazione.push(valutazione)
     }
+
+    // Metodo per modificare una valutazione esistente
+    modificaValutazione(utente, rank, commento) {
+        const valutazione = this.valutazione.find(v => v.utente === utente)
+        if (valutazione) {
+            valutazione.rank = rank
+            valutazione.commento = commento
+        } else {
+            console.log(`Valutazione per l'utente ${utente} non trovata.`)
+        }
+    }
 }
 class Valutazione{
 
@@ -606,6 +634,7 @@ class Valutazione{
     }
 }
 
+// Funzione per stampare tutte le recensioni dato un piatto
 const printReview = (id) => {
     // Prendi le recensioni dal Local Storage
     const recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
@@ -626,19 +655,26 @@ const printReview = (id) => {
         recensioneHtml = "Ancora nessuna recensione."
     }
 
+    // Controllo se l'utente ha già effettuato una recensione
+    // 'false' -> Lascia una recensione , placeReview() , Invia recensione
+    const hasReviewed = hasUserLeftReview(id)
+
     recensioneHtml += `
-        <button class="btn btn-light review-button">Lascia una recensione</button>
+        <button class="btn btn-light review-button">${hasReviewed ? 'Modifica recensione' : 'Lascia una recensione'}</button>
         <div id="reviewContainer-${id}" style="display:none;">
             <textarea id="reviewText-${id}" rows="4" cols="50" placeholder="Scrivi la tua recensione qui..."></textarea><br>
             <input type="number" id="reviewRank-${id}" min="1" max="5" placeholder="Valutazione (1-5)">
-            <button class="btn btn-light" onclick="placeReview(${id})">Invia Recensione</button>
+            <button class="btn btn-light" onclick="${hasReviewed ? `editReview(${id})` : `placeReview(${id})`}">${hasReviewed ? 'Modifica Recensione' : 'Invia Recensione'}</button>
         </div>
     `
 
     return recensioneHtml
 }
 
+// Funzione per piazzare una nuova recensione dell'utente loggato
 const placeReview = (idMeal) => {
+
+    console.log("placeReview called")
 
     const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
 
@@ -648,6 +684,7 @@ const placeReview = (idMeal) => {
         return
     }
 
+    // Recupero i dati dell'overlay
     const commento = document.getElementById('overlay-reviewText').value
     const rank = document.getElementById('overlay-reviewRank').value
 
@@ -658,15 +695,19 @@ const placeReview = (idMeal) => {
 
     // Prendi le recensioni dal Local Storage
     let recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+
+    // Mappo le recensioni in modo che riflettano un oggetto di tipo Recensione() 
     recensioni = recensioni.map(review => Object.assign(new Recensione(), review))
 
     let recensione = recensioni.find(review => review.idPasto === idMeal)
 
+    // Creo la nuova istanza recensione , se non esiste
     if (!recensione) {
         recensione = new Recensione(idMeal)
         recensioni.push(recensione)
     }
 
+    // Aggiungo la nuova recensione all'array per l'idPasto = idMeal
     recensione.aggiungiValutazione(utenteLoggato.username, rank, commento)
 
     // Aggiorna il local storage
@@ -675,6 +716,80 @@ const placeReview = (idMeal) => {
     // Aggiorna la visualizzazione delle recensioni
     document.getElementById('review-overlay').style.display = 'none'
     document.getElementById('review').innerHTML = printReview(idMeal)
+
+    // Ricarica la pagina
+    window.location.reload()
+}
+
+// Controlla se: o nessuno è loggato o l'utente loggato non ha effettuato ancora nessuna recensione sul piatto
+const hasUserLeftReview = (idMeal) => {
+
+    const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+    if (!utenteLoggato) {
+        return false
+    }
+
+    // Prendi le recensioni dal Local Storage
+    const recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+
+    // Trova la recensione per il pasto specifico
+    const recensione = recensioni.find(review => review.idPasto === idMeal)
+
+    if (recensione) {
+        // Itera tra le valutazioni della recensione
+        for (let valutazione of recensione.valutazione) {
+            if (valutazione.utente === utenteLoggato.username) {
+                return true
+            }
+        }
+    }
+
+    return false
+}
+
+const editReview = (idMeal) => {
+
+    console.log("editReview called")
+
+    // Non serve effettuare il controllo sull'utente loggato perché arrivare richiamare questa funzione implica implicitamente
+    // che c'è un utente loggato e inoltre che ha già effettuato una recensione
+
+    const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+
+    // Recupero i dati dell'overlay
+    const commento = document.getElementById('overlay-reviewText').value
+    const rank = document.getElementById('overlay-reviewRank').value
+
+    if (!commento || !rank) {
+        alert("Perfavore, inserisci sia una valutazione che un commento")
+        return
+    }
+
+    // Prendi le recensioni dal Local Storage
+    let recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+
+    // Mappo le recensioni in modo che riflettano un oggetto di tipo Recensione() 
+    recensioni = recensioni.map(review => Object.assign(new Recensione(), review))
+
+    // Recupera la recensione del pasto corrispondente
+    let recensione = recensioni.find(review => review.idPasto === idMeal)
+
+    if (recensione) {
+        // Modifico la recensione
+        recensione.modificaValutazione(utenteLoggato.username, rank, commento)
+
+        // Aggiorna il local storage
+        localStorage.setItem('recensioni', JSON.stringify(recensioni))
+
+        // Aggiorna la visualizzazione delle recensioni
+        document.getElementById('review-overlay').style.display = 'none'
+        document.getElementById('review').innerHTML = printReview(idMeal)
+
+        // Ricarica la pagina
+        window.location.reload()
+    } else {
+        console.error(`Recensione per il pasto con ID ${idMeal} non trovata.`)
+    }
 }
 
 
