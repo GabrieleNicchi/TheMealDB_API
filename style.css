@@ -159,22 +159,59 @@ p{line-height: 28px; color:#333; font-weight: 300;}
     /* ------------------------ Pasti ------------------------ */
 
     .meal {
-        border: 2px solid purple;
-        border-radius: 20px;
+        border: 2px solid purple;  /* Box viola */
+        border-radius: 10px;
         box-shadow: 0 0 5px 2px rgba(128, 0, 128, 0.5);
-        padding: 10px; /* Aggiungi padding per migliorare l'aspetto */
-        margin-bottom: 20px; /* Spazio tra gli elementi */
-      }
-
-    /* Bottone preferiti*/
-    .meal .btn {
+        padding: 8px;
+        margin-left: 20px;
+        margin-right: 20px;
+        background-color: azure;
+        margin-bottom: 20px;
+        position: relative;  /* Necessario per il posizionamento del pulsante */
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        /*border: none;*/
-        padding: 5px;
+        justify-content: space-between;
+    }
+
+    .meal img {
+        width: 100%; /* Ridurre la dimensione dell'immagine */
+        max-width: 200px;  /* Limitare la dimensione massima dell'immagine */
+        height: auto;
+        margin-bottom: 15px;  /* Spazio tra immagine e descrizione */
+    }
+
+    .meal .btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 8px 12px;
+        background-color: purple;
+        color: white;
+        border: none;
+        border-radius: 50%;
         cursor: pointer;
-      }
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .meal .btn:hover {
+        background-color: #660066;  /* Colore di hover più scuro */
+    }
+
+    .meal .description {
+        text-align: center;
+        color: #333;
+        font-size: 16px;
+        font-weight: 300;
+    }
+
+    /* -------------------- Elenco pasti -------------------- */
+    .meal-container {
+        display: flex;
+        flex-direction: column;  /* Mettere i piatti uno sotto l'altro */
+        gap: 20px;  /* Spazio tra i piatti */
+    }
+
     
 
    
