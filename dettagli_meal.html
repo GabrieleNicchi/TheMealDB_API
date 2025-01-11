@@ -50,6 +50,16 @@
 
     <div id="meal-container"></div>
 
+    <!-- OVERLAY -->
+    <div id="review-overlay" style="display:none;">
+        <div class="overlay-content">
+            <textarea id="overlay-reviewText" rows="4" cols="50" placeholder="Scrivi la tua recensione qui..."></textarea><br>
+            <input type="number" id="overlay-reviewRank" min="1" max="5" placeholder="Valutazione (1-5)">
+            <button class="btn btn-light" id="submit-review">Invia Recensione</button>
+            <button class="btn btn-light" id="close-overlay">Chiudi</button>
+        </div>
+    </div>
+
     <script>
         
         document.addEventListener("DOMContentLoaded", function() {

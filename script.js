@@ -203,6 +203,7 @@ const getDetailMealList = ( id ) => {
 
 // Funzione di stampa di un pasto
 const printDetailMeal = (meal, mealContainer) => {
+
     // Crea l'elemento per ogni pasto
     const mealElement = document.createElement('div')
     mealElement.classList.add('meal-detail')
@@ -228,8 +229,13 @@ const printDetailMeal = (meal, mealContainer) => {
 
     // Aggiungi l'event listener al bottone delle recensioni
     mealElement.querySelector('.review-button').addEventListener('click', () => {
-        const reviewContainer = mealElement.querySelector(`#reviewContainer-${meal.idMeal}`)
-        reviewContainer.style.display = reviewContainer.style.display === 'none' ? 'block' : 'none'
+        document.getElementById('review-overlay').style.display = 'flex'
+        document.getElementById('submit-review').onclick = () => placeReview(meal.idMeal)
+    })
+
+    // Chiudi l'overlay
+    document.getElementById('close-overlay').addEventListener('click', () => {
+        document.getElementById('review-overlay').style.display = 'none'
     })
 
     // Aggiungi ogni pasto al contenitore
@@ -605,7 +611,7 @@ const printReview = (id) => {
     const recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
     let recensione = recensioni.find(review => review.idPasto === id)
 
-    let recensioneHtml = "";
+    let recensioneHtml = ""
 
     if (recensione && recensione.valutazione.length > 0) {
         recensione.valutazione.forEach(valutazione => {
@@ -635,14 +641,15 @@ const printReview = (id) => {
 const placeReview = (idMeal) => {
 
     const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+
     if (!utenteLoggato) {
         alert("Perfavore, effettua il login per lasciare una recensione")
         window.location.href = 'login.html'
         return
     }
 
-    const commento = document.getElementById(`reviewText-${idMeal}`).value
-    const rank = document.getElementById(`reviewRank-${idMeal}`).value
+    const commento = document.getElementById('overlay-reviewText').value
+    const rank = document.getElementById('overlay-reviewRank').value
 
     if (!commento || !rank) {
         alert("Perfavore, inserisci sia una valutazione che un commento")
@@ -650,7 +657,9 @@ const placeReview = (idMeal) => {
     }
 
     // Prendi le recensioni dal Local Storage
-    const recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+    let recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+    recensioni = recensioni.map(review => Object.assign(new Recensione(), review))
+
     let recensione = recensioni.find(review => review.idPasto === idMeal)
 
     if (!recensione) {
@@ -664,6 +673,8 @@ const placeReview = (idMeal) => {
     localStorage.setItem('recensioni', JSON.stringify(recensioni))
 
     // Aggiorna la visualizzazione delle recensioni
-    document.getElementById(`reviewContainer-${idMeal}`).style.display = 'none'
+    document.getElementById('review-overlay').style.display = 'none'
     document.getElementById('review').innerHTML = printReview(idMeal)
 }
+
+
