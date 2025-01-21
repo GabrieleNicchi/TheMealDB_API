@@ -13,38 +13,54 @@ p{line-height: 28px; color:#333; font-weight: 300;}
 .small-text{font-size: 14px;}
 .intro-text{text-transform: uppercase; font-size: 20px; font-weight: bold;}
 
+/* ----------------------- ! Title ----------------------- */
+    .title {
+        margin-top: 110px; /* Margine superiore di almeno 20 */
+    }
 
 /* ----------------------- ! Header ----------------------- */
 
-.header{
-    /*border: 1px solid red;*/
-    background-color: none;
-    width: 100%;
-    position: fixed;
-    z-index: 1; 
-    left:50%;
-    transform: translateX(-50%);
-    padding-top: 18px;
-    padding-bottom: 1px;
-    display: flex;
-    max-width: 1200px;
-    border-radius: 20px;
+    .header{
+        /*border: 1px solid red;*/
+        background-color: none;
+        width: 100%;
+        position: fixed;
+        z-index: 1; 
+        left:50%;
+        transform: translateX(-50%);
+        padding-top: 18px;
+        padding-bottom: 1px;
+        display: flex;
+        max-width: 1200px;
+        border-radius: 20px;
+        }
+
+    .fixed-header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000; /* Assicurati che l'header sia sopra gli altri elementi */
+        background-color: #fff; /* Colore di sfondo per evitare trasparenze */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Aggiungi un'ombra per separare l'header dal contenuto */
     }
     
     
-.menu{
-    /*border: 1px solid red;*/
-    background-color: #fff;
-    transition: all 1s cubic-bezier(.215, .61, .355, 1);
-    z-index: 1; 
-    display: flex;
-    align-items: center; 
-    width: 100%; 
-    border-radius: 20px;
+    .menu{
+        /*border: 1px solid red;*/
+        background-color: #fff;
+        transition: all 1s cubic-bezier(.215, .61, .355, 1);
+        z-index: 1; 
+        display: flex;
+        align-items: center; 
+        width: 100%; 
+        border-radius: 20px;
     }
     
-    .menu li{display: inline-block;}
+    .menu li {
+        list-style: none;
+    }
     .menu li a{color: #000; padding: 15px; display: block;}
+    
     .register{ margin-left: auto;}
     /* Aumentare la larghezza del contenitore del gruppo di input */
     .input-group {width: 200%; }
@@ -159,59 +175,124 @@ p{line-height: 28px; color:#333; font-weight: 300;}
     /* ------------------------ Pasti ------------------------ */
 
     .meal {
-        border: 2px solid purple;  /* Box viola */
+        border: 1px solid #ccc;
         border-radius: 10px;
-        box-shadow: 0 0 5px 2px rgba(128, 0, 128, 0.5);
-        padding: 8px;
-        margin-left: 20px;
-        margin-right: 20px;
-        background-color: azure;
-        margin-bottom: 20px;
-        position: relative;  /* Necessario per il posizionamento del pulsante */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        background-color: #fff;
+        width: 320px; 
+        text-align: center;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: space-between;
+        gap: 10px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .meal:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .meal img {
-        width: 100%; /* Ridurre la dimensione dell'immagine */
-        max-width: 200px;  /* Limitare la dimensione massima dell'immagine */
         height: auto;
-        margin-bottom: 15px;  /* Spazio tra immagine e descrizione */
+        border-radius: 10px;
+        display: block;
+        margin: 0 auto; 
     }
 
     .meal .btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        padding: 8px 12px;
-        background-color: purple;
-        color: white;
+        
+        color: purple;
+        background: none; 
         border: none;
-        border-radius: 50%;
         cursor: pointer;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        text-transform: uppercase; 
+        font-size: 14px; 
+        font-weight: bold;
     }
 
     .meal .btn:hover {
-        background-color: #660066;  /* Colore di hover più scuro */
+        background: none; 
+        color: purple; 
     }
 
     .meal .description {
-        text-align: center;
         color: #333;
         font-size: 16px;
-        font-weight: 300;
+        font-weight: 400;
+        line-height: 1.4;
+        text-align: justify;
     }
 
-    /* -------------------- Elenco pasti -------------------- */
-    .meal-container {
+/* -------------------- Elenco pasti -------------------- */
+    /* Style for meal container */
+    #meal-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px; /* Maggiore spazio tra gli elementi */
+        margin-top: 1px;
+        padding: 20px;
+    }
+
+    #meal-container div {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
         display: flex;
-        flex-direction: column;  /* Mettere i piatti uno sotto l'altro */
-        gap: 20px;  /* Spazio tra i piatti */
+        flex-direction: column;
+        justify-content: space-between; 
     }
 
+    #meal-container div:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    #meal-container .btn img{
+        width: 30px;
+        display: block;
+    }
+
+    #meal-container img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    #meal-container h2 {
+        font-size: 16px; /* Ridotto da 18px a 16px */
+        font-weight: bold;
+        margin: 10px;
+        color: #333;
+        text-align: center;
+        min-height: 40px; /* Altezza minima per i titoli */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #meal-container p {
+        font-size: 14px;
+        margin: 0 10px 10px;
+        color: #665; 
+        text-align: justify; 
+    }
+
+    .card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .card-link:hover {
+        text-decoration: none;
+    }
     
 
    

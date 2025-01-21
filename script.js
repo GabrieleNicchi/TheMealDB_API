@@ -144,35 +144,38 @@ const getMealList = ( ricerca , mealContainer , type, ref) => {
 */
 // Funzione di stampa dei pasti
 const printMeal = (data_meal, mealContainer) => {
-
     for (var i = 0; i < data_meal.length; i++) {
         const meal = data_meal[i]
-
         const prefs = checkFavoriteMeal(meal)
-        
+
         // Crea l'elemento per ogni pasto
         const mealElement = document.createElement('div')
         mealElement.classList.add('meal')
-        
+
         // Inserisci il div nella pagina
         mealElement.innerHTML = `
-            <h2>${meal.strMeal}</h2>
-            <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+            <a href="dettagli_meal.html?idMeal=${meal.idMeal}" class="card-link">
+                <h2>${meal.strMeal}</h2>
+                <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+            </a>
             <p>
-                <a href="dettagli_meal.html?idMeal=${meal.idMeal}">Dettagli</a>
                 <button class="btn btn-light fav-button">
-                    <img src="img/${prefs ? 'heart-fill' : 'heart'}.svg" alt="Icona preferiti" width="30" height="30">
+                    <img src="img/${prefs ? 'heart-fill' : 'heart'}.svg" alt="Icona preferiti" width="200" height="200">
                 </button>
             </p>
         `
-        
+
         // Aggiungi l'event listener al bottone dei preferiti
-        mealElement.querySelector('.fav-button').addEventListener('click', () => updateFavMeal(meal, mealElement.querySelector('.fav-button')))
+        mealElement.querySelector('.fav-button').addEventListener('click', (event) => {
+            event.stopPropagation() // Evita che il click sul pulsante favorisca la navigazione
+            updateFavMeal(meal, mealElement.querySelector('.fav-button'))
+        })
 
         // Aggiungi ogni pasto al contenitore
         mealContainer.appendChild(mealElement)
     }
 }
+
 
 /* ------------------------------ MEAL DETTAGLI ------------------------------ */
 
@@ -424,26 +427,26 @@ const getFavMeal = () => {
 
 // Funzione dei pasti preferiti del ricettario
 const printMealPrefs = (data_meal, mealContainer) => {
-
     for (var i = 0; i < data_meal.length; i++) {
-        const meal = data_meal[i]
-        const prefs = checkFavoriteMeal(meal)
-        const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
-        const pastoPreferito = utenteLoggato.pastiPreferiti.find(p => p.id === meal.idMeal)
-        const commento = pastoPreferito ? pastoPreferito.commento : ''
+        const meal = data_meal[i];
+        const prefs = checkFavoriteMeal(meal);
+        const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'));
+        const pastoPreferito = utenteLoggato.pastiPreferiti.find(p => p.id === meal.idMeal);
+        const commento = pastoPreferito ? pastoPreferito.commento : '';
 
         // Crea l'elemento per ogni pasto
-        const mealElement = document.createElement('div')
-        mealElement.classList.add('meal')
-        
+        const mealElement = document.createElement('div');
+        mealElement.classList.add('meal');
+
         // Inserisci il div nella pagina
         mealElement.innerHTML = `
-            <h2>${meal.strMeal}</h2>
-            <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+            <a href="dettagli_meal.html?idMeal=${meal.idMeal}" class="card-link">
+                <h2>${meal.strMeal}</h2>
+                <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+            </a>
             <p>
-                <a href="dettagli_meal.html?idMeal=${meal.idMeal}">Dettagli</a>
                 <button class="btn btn-light note-button">Mostra/Nascondi Nota</button>
-                <div id='noteContainer-${meal.idMeal}' style='display:none;'>
+                <div id='noteContainer-${meal.idMeal}' class='note-container' style='display:none;'>
                     ${commento ? 
                         `<p>${commento}</p><button class="btn btn-light edit-note-button" onclick="editNote(${meal.idMeal}, '${commento}')">Modifica Nota</button>` 
                         : 
@@ -454,22 +457,71 @@ const printMealPrefs = (data_meal, mealContainer) => {
                     <img src="img/${prefs ? 'heart-fill' : 'heart'}.svg" alt="Icona preferiti" width="30" height="30">
                 </button>
             </p>
-        `
-        
+        `;
+
         // Aggiungi l'event listener al bottone dei preferiti
-        mealElement.querySelector('.fav-button').addEventListener('click', () => updateFavMeal(meal, mealElement.querySelector('.fav-button')))
+        mealElement.querySelector('.fav-button').addEventListener('click', (event) => {
+            event.stopPropagation(); // Evita che il click sul pulsante favorisca la navigazione
+            updateFavMeal(meal, mealElement.querySelector('.fav-button'));
+        });
 
         // Aggiungi l'event listener al bottone delle note
-        mealElement.querySelector('.note-button').addEventListener('click', () => {
+        mealElement.querySelector('.note-button').addEventListener('click', (event) => {
+            
             const noteContainer = mealElement.querySelector(`#noteContainer-${meal.idMeal}`)
             noteContainer.style.display = noteContainer.style.display === 'none' ? 'block' : 'none'
-        })
+            event.stopPropagation() // Evita che il click sul pulsante favorisca la navigazione
+        });
 
         // Aggiungi ogni pasto al contenitore
         mealContainer.appendChild(mealElement);
     }
+};
+
+
+/* ------------------------------ CONTROLLO INPUT ------------------------------ */
+
+//funzione generale validità input con regex
+const CheckForm = (value) => {
+
+    var regex = /^[a-z\s]+$/i;
+    if(value.match(regex)){
+        return true
+    } else {
+        return false;
+    }
 }
 
+//funzione generale che l'utente abbia inserito qualcosa nel campo
+const CheckInsert = (value) => {
+
+if(value.length > 0){
+    return true
+} else {
+    return false
+}
+}
+
+const checkFormMeal = () => {
+
+    var searchinput = document.getElementById("searchInputMeal")
+    var meal = document.getElementById("searchInputMeal").value
+    var errorMessage = document.getElementById("errorMessageMeal")
+
+    if(CheckInsert(meal)){
+        if(CheckForm(meal)){
+            return true
+        } else {
+            errorMessage.innerHTML = "Ma dove cazzo esisterà una ricetta con un carattere speciale"
+            searchinput.style = "border: 1px solid red"
+            return false
+        }
+    } else {
+        errorMessage.innerHTML = "Sì ma inserisci qualcosa maronna calimero"
+        searchinput.style = "border: 1px solid red"
+        return false
+    }
+}
 
 
 /* ------------------------------ PROFILO UTENTE ------------------------------ */
