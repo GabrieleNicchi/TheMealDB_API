@@ -103,7 +103,7 @@ const getMealDetailStore = (id) => {
     // Cerca per ID del pasto
     dataMeal = meals.filter(meal => meal.idMeal === id)
 
-    const mealContainer = document.getElementById('meal-container')
+    const mealContainer = document.getElementById('meal-detail')
     
     
     //mealContainer.innerHTML = ''
@@ -381,8 +381,10 @@ const saveNote = (idMeal, commento) => {
 const editNote = (idMeal, commento) => {
     const noteContainer = document.querySelector(`#noteContainer-${idMeal}`)
     noteContainer.innerHTML = `
+        <div class="noteArea">
         <textarea id='noteText-${idMeal}' rows='4' cols='50' placeholder='Scrivi la tua nota qui...'>${commento}</textarea><br>
         <button class="btn btn-light" onclick="saveNote(${idMeal}, document.getElementById('noteText-${idMeal}').value)">Salva Nota</button>
+        </div>
     `
 }
 
@@ -427,56 +429,100 @@ const getFavMeal = () => {
 
 // Funzione dei pasti preferiti del ricettario
 const printMealPrefs = (data_meal, mealContainer) => {
-    for (var i = 0; i < data_meal.length; i++) {
-        const meal = data_meal[i];
-        const prefs = checkFavoriteMeal(meal);
-        const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'));
-        const pastoPreferito = utenteLoggato.pastiPreferiti.find(p => p.id === meal.idMeal);
-        const commento = pastoPreferito ? pastoPreferito.commento : '';
+    
+    for (let i = 0; i < data_meal.length; i++) {
+        const meal = data_meal[i]
+        const prefs = checkFavoriteMeal(meal)
+        const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+        const pastoPreferito = utenteLoggato.pastiPreferiti.find(p => p.id === meal.idMeal)
+        const commento = pastoPreferito ? pastoPreferito.commento : ''
 
         // Crea l'elemento per ogni pasto
-        const mealElement = document.createElement('div');
-        mealElement.classList.add('meal');
+        const mealElement = document.createElement('div')
+        mealElement.classList.add('meal', 'card')
+        mealElement.style.cursor = 'pointer'
 
-        // Inserisci il div nella pagina
+        // Aggiungi l'evento click alla card (controllando il target)
+        mealElement.addEventListener('click', (event) => {
+            // Verifica se il target è interattivo (textarea o pulsante)
+            if (event.target.tagName === 'TEXTAREA' || event.target.tagName === 'BUTTON') {
+                return
+            }
+            // Naviga ai dettagli del meal
+            window.location.href = `dettagli_meal.html?idMeal=${meal.idMeal}`
+        })
+
+        // Inserisci il contenuto della card
         mealElement.innerHTML = `
-            <a href="dettagli_meal.html?idMeal=${meal.idMeal}" class="card-link">
-                <h2>${meal.strMeal}</h2>
-                <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
-            </a>
+            <h2>${meal.strMeal}</h2>
+            <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
             <p>
                 <button class="btn btn-light note-button">Mostra/Nascondi Nota</button>
-                <div id='noteContainer-${meal.idMeal}' class='note-container' style='display:none;'>
+                <div id='noteContainer-${meal.idMeal}' style='display:none;'>
                     ${commento ? 
-                        `<p>${commento}</p><button class="btn btn-light edit-note-button" onclick="editNote(${meal.idMeal}, '${commento}')">Modifica Nota</button>` 
+                        `<p>${commento}</p><button class="btn btn-light edit-note-button">Modifica Nota</button>` 
                         : 
-                        `<textarea id='noteText-${meal.idMeal}' rows='4' cols='50' placeholder='Scrivi la tua nota qui...'></textarea><br><button class="btn btn-light" onclick="saveNote(${meal.idMeal}, document.getElementById('noteText-${meal.idMeal}').value)">Salva Nota</button>`
+                        `
+                        <div class="noteArea">
+                        <textarea id='noteText-${meal.idMeal}' rows='4' cols='50' placeholder='Scrivi la tua nota qui...'></textarea><br><button class="btn btn-light save-note-button">Salva Nota</button>
+                        </div>
+                        `
                     }
                 </div>
                 <button class="btn btn-light fav-button">
                     <img src="img/${prefs ? 'heart-fill' : 'heart'}.svg" alt="Icona preferiti" width="30" height="30">
                 </button>
             </p>
-        `;
+        `
 
-        // Aggiungi l'event listener al bottone dei preferiti
-        mealElement.querySelector('.fav-button').addEventListener('click', (event) => {
-            event.stopPropagation(); // Evita che il click sul pulsante favorisca la navigazione
-            updateFavMeal(meal, mealElement.querySelector('.fav-button'));
-        });
-
-        // Aggiungi l'event listener al bottone delle note
+        // Event listener per il pulsante "Mostra/Nascondi Nota"
         mealElement.querySelector('.note-button').addEventListener('click', (event) => {
-            
+            event.stopPropagation()
             const noteContainer = mealElement.querySelector(`#noteContainer-${meal.idMeal}`)
             noteContainer.style.display = noteContainer.style.display === 'none' ? 'block' : 'none'
-            event.stopPropagation() // Evita che il click sul pulsante favorisca la navigazione
-        });
+        })
+
+        // Gestione della textarea
+        const textArea = mealElement.querySelector(`#noteText-${meal.idMeal}`)
+        if (textArea) {
+            textArea.addEventListener('click', (event) => {
+                event.stopPropagation()
+            })
+        }
+
+        // Event listener per il pulsante "Salva Nota"
+        const saveButton = mealElement.querySelector('.save-note-button')
+        if (saveButton) {
+            saveButton.addEventListener('click', (event) => {
+                event.stopPropagation()
+                const noteText = mealElement.querySelector(`#noteText-${meal.idMeal}`).value
+                saveNote(meal.idMeal, noteText)
+            })
+        }
+
+        // Event listener per il pulsante "Modifica Nota"
+        const editButton = mealElement.querySelector('.edit-note-button');
+        if (editButton) {
+            editButton.addEventListener('click', (event) => {
+                event.stopPropagation() 
+                editNote(meal.idMeal, commento)
+            })
+        }
+
+        // Event listener per il pulsante "Preferiti"
+        mealElement.querySelector('.fav-button').addEventListener('click', (event) => {
+            event.stopPropagation()
+            updateFavMeal(meal, mealElement.querySelector('.fav-button'))
+        })
 
         // Aggiungi ogni pasto al contenitore
-        mealContainer.appendChild(mealElement);
+        mealContainer.appendChild(mealElement)
     }
-};
+}
+
+
+
+
 
 
 /* ------------------------------ CONTROLLO INPUT ------------------------------ */
@@ -639,7 +685,8 @@ const checkUserLogged = () => {
         document.getElementById('logout-button').addEventListener('click', function() {
             sessionStorage.removeItem('utenteLoggato')
             window.location.href = 'index.html'
-        });
+        })
+
      } else {
          // Mostra la scritta "Accedi" e l'immagine
          userInfoElement.innerHTML = `
