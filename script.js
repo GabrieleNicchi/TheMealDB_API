@@ -530,23 +530,16 @@ const printMealPrefs = (data_meal, mealContainer) => {
 //funzione generale validità input con regex
 const CheckForm = (value) => {
 
-    var regex = /^[a-z\s]+$/i;
+    var regex = /^[a-z\s]+$/i
     if(value.match(regex)){
         return true
     } else {
-        return false;
+        return false
     }
 }
 
 //funzione generale che l'utente abbia inserito qualcosa nel campo
-const CheckInsert = (value) => {
-
-if(value.length > 0){
-    return true
-} else {
-    return false
-}
-}
+const CheckInsert = (value) => value.trim().length > 0
 
 const checkFormMeal = () => {
 
@@ -567,6 +560,63 @@ const checkFormMeal = () => {
         searchinput.style = "border: 1px solid red"
         return false
     }
+}
+
+const checkUserExist = (username, email) => {
+
+    const utenti = JSON.parse(localStorage.getItem('utenti')) || []
+
+    // Trova un utente con lo stesso username o email
+    const userExists = utenti.find(user => user.username === username || user.email === email)
+
+    if (!userExists) return null
+    return userExists.username === username ? "username" : "email"
+}
+
+const checkRegister = (username, email, password, paese) => {
+
+    const fields = [
+        { value: username, errorMessageId: "errorMessagenome_utente" },
+        { value: email, errorMessageId: "errorMessageemail" },
+        { value: password, errorMessageId: "errorMessagepassword" },
+        { value: paese, errorMessageId: "errorMessagepaese" }
+    ]
+
+    let isValid = true
+
+     // Ripulisci tutti i messaggi di errore all'inizio
+     fields.forEach(field => {
+        document.getElementById(field.errorMessageId).innerHTML = ""
+    })
+
+    const existUser = checkUserExist(username, email)
+
+    if (existUser === "username") {
+        document.getElementById("errorMessagenome_utente").innerHTML = "Nome utente già esistente"
+        isValid = false
+        return isValid
+    } 
+
+    if (existUser === "email") {
+        document.getElementById("errorMessageemail").innerHTML = "Utente già registrato con questa mail"
+        isValid = false
+        return isValid
+    }
+
+    console.log("Username:", username, "Email:", email);
+    console.log("Risultato checkUserExist:", checkUserExist(username, email));
+    console.log("CheckInsert Username:", CheckInsert(username));
+
+    fields.forEach(field => {
+        if (CheckInsert(field.value)) {
+            document.getElementById(field.errorMessageId).innerHTML = ""
+        } else {
+            document.getElementById(field.errorMessageId).innerHTML = "Per favore riempi questo campo"
+            isValid = false
+        }
+    })
+
+    return isValid
 }
 
 
@@ -609,31 +659,35 @@ class PastiPreferiti {
 
 const register = () => {
 
+    
+
     const username = document.getElementById('nome_utente').value
     const email = document.getElementById('email').value
     const password = document.getElementById('password').value
     const paese = document.getElementById('paese').value
     const categoria = document.getElementById('categoria').value
 
-    const nuovoUtente = new Utente(username, email, password, paese, categoria)
+    if(checkRegister(username, email, password, paese)) {
+        const nuovoUtente = new Utente(username, email, password, paese, categoria)
 
-    let utenti = JSON.parse(localStorage.getItem('utenti')) || []
-    utenti.push(nuovoUtente);
-    localStorage.setItem('utenti', JSON.stringify(utenti))
+        let utenti = JSON.parse(localStorage.getItem('utenti')) || []
+        utenti.push(nuovoUtente)
+        localStorage.setItem('utenti', JSON.stringify(utenti))
 
-    console.log('Utente registrato:', nuovoUtente)
-    window.location.href = 'login.html'
+        window.location.href = 'login.html'
+        alert('Utente registrato!')
+    }
 
     return false
 
 }
 
 const login = () => {
-    const utenza = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const utenza = document.getElementById('email').value
+    const password = document.getElementById('password').value
 
     // Recupera l'array di utenti dal LocalStorage
-    const utenti = JSON.parse(localStorage.getItem('utenti')) || [];
+    const utenti = JSON.parse(localStorage.getItem('utenti')) || []
 
     // Cerca l'utente che corrisponde all'email o al nome utente e alla password
     const utente = utenti.find(user => 
