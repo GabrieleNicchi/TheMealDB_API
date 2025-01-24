@@ -41,10 +41,11 @@
         
                 
             <!-- Barra di ricerca -->
-            <li><form method="GET" action="elenco_meal.html" onsubmit="return checkFormMeal()" class="w-100">
+            <li>
+                <form method="GET" action="elenco_meal.html" onsubmit="" class="w-100">
                 <div class="input-group">
                     <input type="text" id="searchInputMeal" placeholder="cerca una ricetta..." name="meal" class="form-control">
-                    <button id="searchButtonMeal" class="btn btn-outline-dark" type="submit">Cerca</button>
+                    <button id="searchButtonMeal" class="btn-search-dark" type="submit">Cerca</button>
                 </div>
             </form>
             </li>
@@ -59,52 +60,56 @@
     <!-- Overlay -->
     <div id="overlay">
         <div class="content">
-    
-            <!-- Filtra per ingrediente -->
-            <form method="GET" action="elenco_meal.html" onsubmit="return checkFormMeal()" class="w-100">
-                <label for="filtra_ingrediente">Filtra per ingrediente: </label>
-                    <input type="text" id="searchInputMeal" placeholder="cerca un ingrediente..." name="ingredient" class="form-control">
+            <button id="closeOverlay" class="btn-close-overlay">&times;</button>
+            <div class="filter-container">
+                <!-- Filtra per ingrediente -->
+                <form method="GET" action="elenco_meal.html" onsubmit="" class="w-100">
+                    <label for="filtra_ingrediente">Filtra per ingrediente: </label>
+                    <div id="errorMessageingredient" class="error-message"></div>
+                    <input type="text" id="searchInputMealIngredient" placeholder="cerca un ingrediente..." name="ingredient" class="form-control">
                     <button id="searchButtonIngredients" class="btn btn-outline-dark" type="submit">Cerca</button>
-            </form>
-    
-            <!-- Filtra per lettera -->
-            <form method="GET" action="elenco_meal.html" onsubmit="" class="w-100">
-                <label for="filtra_lettera">Filtra per lettera: </label>
-                <select name="letter">
-                    <option value="">Seleziona una lettera</option>
-                    <!-- Aggiungere tutte le lettere dell'alfabeto -->
-                    <option value="a">A</option>
-                    <option value="b">B</option>
-                    <option value="c">C</option>
-                    <option value="d">D</option>
-                    <option value="e">E</option>
-                    <option value="f">F</option>
-                    <option value="g">G</option>
-                    <option value="h">H</option>
-                    <option value="i">I</option>
-                    <option value="j">J</option>
-                    <option value="k">K</option>
-                    <option value="l">L</option>
-                    <option value="m">M</option>
-                    <option value="n">N</option>
-                    <option value="o">O</option>
-                    <option value="p">P</option>
-                    <option value="q">Q</option>
-                    <option value="r">R</option>
-                    <option value="s">S</option>
-                    <option value="t">T</option>
-                    <option value="u">U</option>
-                    <option value="v">V</option>
-                    <option value="w">W</option>
-                    <option value="x">X</option>
-                    <option value="y">Y</option>
-                    <option value="z">Z</option>
-                </select>
-                <button id="searchButtonLetter" class="btn btn-outline-dark" type="submit">Cerca</button>
-            </form>
-                <button id="closeOverlay">Chiudi</button>
+                </form>
+
+                <!-- Filtra per lettera -->
+                <form method="GET" action="elenco_meal.html" onsubmit="" class="w-100">
+                    <label for="filtra_lettera">Filtra per lettera: </label>
+                    <div id="errorMessageletter" class="error-message"></div>
+                    <select name="letter" id="searchInputMealLetter">
+                        <option value="">Seleziona una lettera</option>
+                        <!-- Aggiungere tutte le lettere dell'alfabeto -->
+                        <option value="a">A</option>
+                        <option value="b">B</option>
+                        <option value="c">C</option>
+                        <option value="d">D</option>
+                        <option value="e">E</option>
+                        <option value="f">F</option>
+                        <option value="g">G</option>
+                        <option value="h">H</option>
+                        <option value="i">I</option>
+                        <option value="j">J</option>
+                        <option value="k">K</option>
+                        <option value="l">L</option>
+                        <option value="m">M</option>
+                        <option value="n">N</option>
+                        <option value="o">O</option>
+                        <option value="p">P</option>
+                        <option value="q">Q</option>
+                        <option value="r">R</option>
+                        <option value="s">S</option>
+                        <option value="t">T</option>
+                        <option value="u">U</option>
+                        <option value="v">V</option>
+                        <option value="w">W</option>
+                        <option value="x">X</option>
+                        <option value="y">Y</option>
+                        <option value="z">Z</option>
+                    </select>
+                    <button id="searchButtonLetter" class="btn btn-outline-dark" type="submit">Cerca</button>
+                </form>
+            </div>
         </div>
     </div>
+
 
     <div class="title">
         <h1 id="execute"></h1>
@@ -129,9 +134,9 @@
             checkUserLogged()
             // Ottieni il parametro 'meal' dalla URL
             var name_param = getQueryParamNames()
-            //console.log(name_param);
+            //console.log(name_param)
             var ricerca = getQueryParam(name_param)
-            //console.log(ricerca);
+            //console.log(ricerca)
     
             // logica execute
             if (name_param == "meal")

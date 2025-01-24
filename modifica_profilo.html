@@ -13,179 +13,80 @@
         <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
         <script src="script.js"></script>
     </head>
-<body>
-
-    <!-- HEADER -->
-    <div class="header">
-        <ul class="menu">
-        
-            <!-- Logo -->
-            <li>
-                <img src="img/logo.png" alt="" >
-            </li>
-        
-            <!-- Home -->
-            <li><a href="index.html"><button type="button" class="btn btn-light">
-                Home<img src="img/house-fill.svg" alt="Icona home" width="24" height="24">
-            </button></a>
-            </li>
-        
-            <!-- Filtro -->
-            <li>
-                <button type="button" id="openOverlay" class="btn btn-light">
-                    Filtra <img src="img/funnel-fill.svg" alt="Icona filtra" width="24" height="24">
-                </button>
-            </li>
-        
-                
-            <!-- Barra di ricerca -->
-            <li><form method="GET" action="elenco_meal.html" onsubmit="return checkFormMeal()" class="w-100">
-                <div class="input-group">
-                    <input type="text" id="searchInputMeal" placeholder="cerca una ricetta..." name="meal" class="form-control">
-                    <button id="searchButtonMeal" class="btn btn-outline-dark" type="submit">Cerca</button>
-                </div>
-            </form>
-            </li>
-        
-            <!-- Registrazione / mostra utente -->
-            <li class="register" id="user-info">
-                <!-- Questo elemento verrà aggiornato dinamicamente -->
-            </li>
-        </ul>
-        </div>
-
-    <!-- Overlay -->
-    <div id="overlay">
-        <div class="content">
-    
-            <!-- Filtra per ingrediente -->
-            <form method="GET" action="elenco_meal.html" onsubmit="return checkFormMeal()" class="w-100">
-                <label for="filtra_ingrediente">Filtra per ingrediente: </label>
-                    <input type="text" id="searchInputMeal" placeholder="cerca un ingrediente..." name="ingredient" class="form-control">
-                    <button id="searchButtonIngredients" class="btn btn-outline-dark" type="submit">Cerca</button>
-            </form>
-    
-            <!-- Filtra per lettera -->
-            <form method="GET" action="elenco_meal.html" onsubmit="" class="w-100">
-                <label for="filtra_lettera">Filtra per lettera: </label>
-                <select name="letter">
-                    <option value="">Seleziona una lettera</option>
-                    <!-- Aggiungere tutte le lettere dell'alfabeto -->
-                    <option value="a">A</option>
-                    <option value="b">B</option>
-                    <option value="c">C</option>
-                    <option value="d">D</option>
-                    <option value="e">E</option>
-                    <option value="f">F</option>
-                    <option value="g">G</option>
-                    <option value="h">H</option>
-                    <option value="i">I</option>
-                    <option value="j">J</option>
-                    <option value="k">K</option>
-                    <option value="l">L</option>
-                    <option value="m">M</option>
-                    <option value="n">N</option>
-                    <option value="o">O</option>
-                    <option value="p">P</option>
-                    <option value="q">Q</option>
-                    <option value="r">R</option>
-                    <option value="s">S</option>
-                    <option value="t">T</option>
-                    <option value="u">U</option>
-                    <option value="v">V</option>
-                    <option value="w">W</option>
-                    <option value="x">X</option>
-                    <option value="y">Y</option>
-                    <option value="z">Z</option>
-                </select>
-                <button id="searchButtonLetter" class="btn btn-outline-dark" type="submit">Cerca</button>
-            </form>
-                <button id="closeOverlay">Chiudi</button>
-        </div>
-    </div>
-
-
-    <div id="user-info">
-        <!-- Qui verranno mostrati i dati dell'utente loggato -->
-    </div>
-    <button id="edit-info-button" class="btn btn-primary">Modifica le tue informazioni</button>
-
-    <div id="edit-info-form" style="display:none;">
-        <form id="user-form">
-            <div class="form-group">
-                <label for="email">Indirizzo mail:</label>
-                <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Inserisci la tua e-mail">
-                <small id="emailHelp" class="form-text text-muted">Non condivideremo mai la tua mail con nessuno.</small>
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" class="form-control" id="password" placeholder="Password">
-            </div>
-            <div class="form-group">
-                <label for="nome_utente">Nome utente:</label>
-                <input type="text" class="form-control" id="nome_utente" placeholder="Inserisci il tuo nome utente">
-            </div>
-            <div class="form-group">
-                <label for="paese">Paese:</label>
-                <input type="text" class="form-control" id="paese" placeholder="Inserisci il tuo paese">
-            </div>
-            <div class="form-group">
-                <label for="categoria">Categoria preferita:</label>
-                <select name="letter" id="categoria" class="form-control">
-                    <option value="">Seleziona una categoria</option>
-                    <option value="Beef">Beef</option>
-                    <option value="Chicken">Chicken</option>
-                    <option value="Dessert">Dessert</option>
-                    <option value="Lamb">Lamb</option>
-                    <option value="Miscellaneous">Miscellaneous</option>
-                    <option value="Pasta">Pasta</option>
-                    <option value="Pork">Pork</option>
-                    <option value="Seafood">Seafood</option>
-                    <option value="Side">Side</option>
-                    <option value="Starter">Starter</option>
-                    <option value="Vegan">Vegan</option>
-                    <option value="Vegetarian">Vegetarian</option>
-                    <option value="Breakfast">Goat</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
-
-
-    <h1>Il tuo profilo </h1>
-    <script>
-
-        document.getElementById('openOverlay').addEventListener('click', function() {
-            document.getElementById('overlay').style.display = 'flex'
-        })
-        
-        document.getElementById('closeOverlay').addEventListener('click', function() {
-            document.getElementById('overlay').style.display = 'none'
-        })
-        
-        document.addEventListener("DOMContentLoaded", function() {
-
-            checkUserLogged()
-
+    <body class="body-register">
+        <div class="form-register">
             
-                const userInfoElement = document.getElementById('user-info')
+            <h1 class="center-text" > Il tuo profilo </h1>
+            
+            <div id="user-profile-info">
+                <!-- Qui verranno mostrati i dati dell'utente loggato -->
+            </div>
+            <button id="edit-info-button" class="btn btn-primary">Modifica le tue informazioni</button>
+    
+            <div id="edit-info-form" style="display:none;">
+                <form id="user-form">
+                    <div class="form-group">
+                        <label for="email">Indirizzo mail:</label>
+                        <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Inserisci la tua e-mail">
+                        <small id="emailHelp" class="form-text text-muted">Non condivideremo mai la tua mail con nessuno.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" class="form-control" id="password" placeholder="Password">
+                    </div>
+                    <div class="form-group">
+                        <label for="nome_utente">Nome utente:</label>
+                        <input type="text" class="form-control" id="nome_utente" placeholder="Inserisci il tuo nome utente">
+                    </div>
+                    <div class="form-group">
+                        <label for="paese">Paese:</label>
+                        <input type="text" class="form-control" id="paese" placeholder="Inserisci il tuo paese">
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoria preferita:</label>
+                        <select name="letter" id="categoria" class="form-control">
+                            <option value="">Seleziona una categoria</option>
+                            <option value="Beef">Beef</option>
+                            <option value="Chicken">Chicken</option>
+                            <option value="Dessert">Dessert</option>
+                            <option value="Lamb">Lamb</option>
+                            <option value="Miscellaneous">Miscellaneous</option>
+                            <option value="Pasta">Pasta</option>
+                            <option value="Pork">Pork</option>
+                            <option value="Seafood">Seafood</option>
+                            <option value="Side">Side</option>
+                            <option value="Starter">Starter</option>
+                            <option value="Vegan">Vegan</option>
+                            <option value="Vegetarian">Vegetarian</option>
+                            <option value="Breakfast">Goat</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+
+                const userInfoElement = document.getElementById('user-profile-info')
                 const editInfoButton = document.getElementById('edit-info-button')
                 const editInfoForm = document.getElementById('edit-info-form')
                 const userForm = document.getElementById('user-form')
-            
+    
                 // Recupera i dati dell'utente loggato dal session storage
                 const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
-            
+    
                 if (utenteLoggato) {
                     // Mostra i dati dell'utente loggato
                     userInfoElement.innerHTML = `
-                        <p>Email: ${utenteLoggato.email}</p>
-                        <p>Nome utente: ${utenteLoggato.username}</p>
-                        <p>Paese: ${utenteLoggato.paese}</p>
-                        <p>Categoria preferita: ${utenteLoggato.categoria}</p>
+                        <p><img src="img/envelope-at-fill.svg" alt="Email Icon" width="24" height="24"> Email: ${utenteLoggato.email}</p>
+                        <p><img src="img/incognito.svg" alt="Password Icon" width="24" height="24"> Password: ${utenteLoggato.password}</p>
+                        <p><img src="img/person-vcard-fill.svg" alt="Username Icon" width="24" height="24"> Nome utente: ${utenteLoggato.username}</p>
+                        <p><img src="img/geo-fill.svg" alt="Country Icon" width="24" height="24"> Paese: ${utenteLoggato.paese}</p>
+                        <p><img src="img/egg-fried.svg" alt="Category Icon" width="24" height="24"> Categoria preferita: ${utenteLoggato.categoria}</p>
                     `
-            
+    
                     // Precompila il form con i dati dell'utente loggato
                     document.getElementById('email').value = utenteLoggato.email
                     document.getElementById('password').value = utenteLoggato.password
@@ -193,48 +94,53 @@
                     document.getElementById('paese').value = utenteLoggato.paese
                     document.getElementById('categoria').value = utenteLoggato.categoria
                 }
-            
+    
                 // Mostra il form di modifica quando si clicca sul pulsante
                 editInfoButton.addEventListener('click', () => {
+                    userInfoElement.style.display = 'none'
+                    editInfoButton.style.display = 'none'
                     editInfoForm.style.display = 'block'
                 })
+    
                 // Gestisci l'invio del form
                 userForm.addEventListener('submit', (event) => {
                     event.preventDefault()
-            
+    
                     // Aggiorna i dati dell'utente
                     utenteLoggato.email = document.getElementById('email').value
                     utenteLoggato.password = document.getElementById('password').value
                     utenteLoggato.username = document.getElementById('nome_utente').value
                     utenteLoggato.paese = document.getElementById('paese').value
                     utenteLoggato.categoria = document.getElementById('categoria').value
-            
+    
                     // Aggiorna il session storage
                     sessionStorage.setItem('utenteLoggato', JSON.stringify(utenteLoggato))
-            
+    
                     // Aggiorna il local storage
                     const utenti = JSON.parse(localStorage.getItem('utenti')) || []
                     const utenteIndex = utenti.findIndex(u => u.email === utenteLoggato.email)
-            
+    
                     if (utenteIndex !== -1) {
-                        utenti[utenteIndex] = utenteLoggato;
+                        utenti[utenteIndex] = utenteLoggato
                         localStorage.setItem('utenti', JSON.stringify(utenti))
                     }
-            
+    
                     // Aggiorna la visualizzazione dei dati dell'utente
                     userInfoElement.innerHTML = `
-                        <p>Email: ${utenteLoggato.email}</p>
-                        <p>Nome utente: ${utenteLoggato.username}</p>
-                        <p>Paese: ${utenteLoggato.paese}</p>
-                        <p>Categoria preferita: ${utenteLoggato.categoria}</p>
+                        <p><img src="img/envelope-at-fill.svg" alt="Email Icon" width="24" height="24"> Email: ${utenteLoggato.email}</p>
+                        <p><img src="img/incognito.svg" alt="Password Icon" width="24" height="24"> Password: ${utenteLoggato.password}</p>
+                        <p><img src="img/person-vcard-fill.svg" alt="Username Icon" width="24" height="24"> Nome utente: ${utenteLoggato.username}</p>
+                        <p><img src="img/geo-fill.svg" alt="Country Icon" width="24" height="24"> Paese: ${utenteLoggato.paese}</p>
+                        <p><img src="img/egg-fried.svg" alt="Category Icon" width="24" height="24"> Categoria preferita: ${utenteLoggato.categoria}</p>
                     `
-            
-                    // Nascondi il form di modifica
-                    editInfoForm.style.display = 'none'
-                })
     
-        })
-    </script>
+                    // Nascondi il form di modifica e mostra le informazioni aggiornate
+                    editInfoForm.style.display = 'none'
+                    userInfoElement.style.display = 'block'
+                    editInfoButton.style.display = 'block'
+                })
+            })
+        </script>
     <!-- Jquery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flickity/3.0.0/flickity.pkgd.min.js" integrity="sha512-achKCfKcYJg0u0J7UDJZbtrffUwtTLQMFSn28bDJ1Xl9DWkl/6VDT3LMfVTo09V51hmnjrrOTbtg4rEgg0QArA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>

@@ -521,10 +521,6 @@ const printMealPrefs = (data_meal, mealContainer) => {
 }
 
 
-
-
-
-
 /* ------------------------------ CONTROLLO INPUT ------------------------------ */
 
 //funzione generale validità input con regex
@@ -541,23 +537,47 @@ const CheckForm = (value) => {
 //funzione generale che l'utente abbia inserito qualcosa nel campo
 const CheckInsert = (value) => value.trim().length > 0
 
-const checkFormMeal = () => {
+const checkFormMeal = (value) => {
 
-    var searchinput = document.getElementById("searchInputMeal")
-    var meal = document.getElementById("searchInputMeal").value
-    var errorMessage = document.getElementById("errorMessageMeal")
+    let searchinput, inputValue, errorMessage
 
-    if(CheckInsert(meal)){
-        if(CheckForm(meal)){
+    if (value === "meal") {
+        searchinput = document.getElementById("searchInputMeal")
+        inputValue = searchinput.value
+        errorMessage = document.getElementById("errorMessagemeal")
+
+    } else if (value === "ingredient") {
+        searchinput = document.getElementById("searchInputMealIngredient")
+        inputValue = searchinput.value
+        errorMessage = document.getElementById("errorMessageingredient")
+
+    } else if (value === "letter") {
+        searchinput = document.getElementById("searchInputMealLetter")
+        inputValue = searchinput.value
+        errorMessage = document.getElementById("errorMessageletter")
+
+        if (!CheckInsert(inputValue)) {
+            errorMessage.innerHTML = "Per favore, seleziona una lettera."
+            searchinput.style.border = "1px solid red"
+            return false
+        }
+        return true
+    } else {
+        console.log("Qualcosa è andato storto")
+        return false
+    }
+
+    if (CheckInsert(inputValue)) {
+        if (CheckForm(inputValue)) {
             return true
         } else {
-            errorMessage.innerHTML = "Ma dove cazzo esisterà una ricetta con un carattere speciale"
-            searchinput.style = "border: 1px solid red"
+            errorMessage.innerHTML = "Il campo contiene caratteri non validi."
+            searchinput.style.border = "1px solid red"
             return false
         }
     } else {
-        errorMessage.innerHTML = "Sì ma inserisci qualcosa maronna calimero"
-        searchinput.style = "border: 1px solid red"
+        errorMessage.innerHTML = "Per favore, inserisci qualcosa."
+        searchinput.style.border = "1px solid red"
         return false
     }
 }
@@ -683,6 +703,7 @@ const register = () => {
 }
 
 const login = () => {
+
     const utenza = document.getElementById('email').value
     const password = document.getElementById('password').value
 
@@ -697,13 +718,13 @@ const login = () => {
     if (utente) {
         // Salva l'utente nel SessionStorage
         sessionStorage.setItem('utenteLoggato', JSON.stringify(utente))
-        console.log('Login effettuato con successo:', utente)
+        alert(`Login effettuato con successo! Ciao ${utente.username}`)
 
         // Reindirizza alla pagina principale o alla dashboard
         window.location.href = 'index.html'
     } else {
         // Gestisci il caso in cui l'utente non venga trovato
-        console.log('Email o password non corretti.')
+        alert('Email o password non corretti, per favore, riprova')
     }
     return false
 }
@@ -751,7 +772,7 @@ const checkUserLogged = () => {
      }
 }
 
-/* ------------------------------ Recensioni ------------------------------ */
+/* ------------------------------ RECENSIONI ------------------------------ */
 
 class Recensione{
     constructor(idPasto) {
