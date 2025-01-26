@@ -215,17 +215,42 @@ const printDetailMeal = (meal, mealContainer) => {
 
     // Inserisci il div nella pagina
     mealElement.innerHTML = `
-        <h1>${meal.strMeal}</h1>
-        <button class="btn btn-light fav-button">
-            <img src="img/${prefs ? 'heart-fill' : 'heart'}.svg" alt="Icona preferiti" width="30" height="30">
-        </button>
-        <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
-        <p><h3>Categoria:</h3> ${meal.strCategory}</p>
-        <p><h3>Area:</h3> ${meal.strArea}</p>
-        <p><h3>Istruzioni:</h3> ${meal.strInstructions}</p>
-        <div id="ingredients">${append_ingredients(meal)}</div>
-        <div id="review">${printReview(meal.idMeal)}</div>
+        <div class='container'>
+            <div class='meal-detail-pointer d-flex flex-column align-items-center'>
+                <!-- Nome, immagine e bottone centrati sopra -->
+                <h1 class="text-center">${meal.strMeal}</h1>
+                <img src="${meal.strMealThumb}" alt="${meal.strMeal}" class='img-detail my-3'>
+                <button class="btn btn-light fav-button">
+                    <img src="img/${prefs ? 'heart-fill' : 'heart'}.svg" alt="Icona preferiti" width="30" height="30">
+                </button>
+
+                <!-- Contenuto organizzato in righe con colonne affiancate -->
+                <div class='row w-100 mt-4'>
+                    <!-- Colonna Istruzioni (prende più spazio) -->
+                    <div class='col-lg-6 col-md-12 d-flex flex-column align-items-center text-center'>
+                        <p><h3>Istruzioni:</h3> ${meal.strInstructions}</p>
+                    </div>
+
+                    <!-- Colonna Categoria e Area -->
+                    <div class='col-lg-3 col-md-6 d-flex flex-column align-items-center text-center'>
+                        <p><h3>Categoria:</h3> ${meal.strCategory}</p>
+                        <p><h3>Area:</h3> ${meal.strArea}</p>
+                    </div>
+
+                    <!-- Colonna Ingredienti -->
+                    <div class='col-lg-3 col-md-6 d-flex flex-column align-items-center text-center'>
+                        <p><h3>Ingredienti:</h3></p>
+                        <div id="ingredients">${append_ingredients(meal)}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="review" class="review-detail">${printReview(meal.idMeal)}</div>
     `
+
+
+
+
 
     // Aggiungi l'event listener al bottone dei preferiti
     mealElement.querySelector('.fav-button').addEventListener('click', () => updateFavMeal(meal, mealElement.querySelector('.fav-button')))
@@ -264,13 +289,13 @@ const printDetailMeal = (meal, mealContainer) => {
 
 // Funzione per stampare tutti gli ingredienti dato un pasto
 const append_ingredients = (meal) => {
-    let ingredientsHTML = "<p><strong>Ingredients:</strong></p><ul>"
+    let ingredientsHTML = "<ul>"
     for (let i = 1; i <= 20; i++) {
-        const ingredient = meal["strIngredient" + i];
-        const measure = meal["strMeasure" + i];
+        const ingredient = meal["strIngredient" + i]
+        const measure = meal["strMeasure" + i]
         if (ingredient && ingredient.trim() !== "") {
-             // Creo un link che mi riporta alla pagina 'dettagli_meal.html' che si occupa di mostrare i pasti in base a un ingrediente principale
-            ingredientsHTML += `<li><a href='elenco_meal.html?ingredient=${encodeURIComponent(ingredient)}'>${ingredient}</a>${measure ? " - " + measure : ""}</li>`
+            // Creo un link che mi riporta alla pagina 'dettagli_meal.html' che si occupa di mostrare i pasti in base a un ingrediente principale
+            ingredientsHTML += `<li class='ingredient-item'><a href='elenco_meal.html?ingredient=${encodeURIComponent(ingredient)}'>${ingredient}</a>${measure ? " - " + measure : ""}</li>`
         }
     }
     ingredientsHTML += "</ul>"
@@ -623,9 +648,9 @@ const checkRegister = (username, email, password, paese) => {
         return isValid
     }
 
-    console.log("Username:", username, "Email:", email);
-    console.log("Risultato checkUserExist:", checkUserExist(username, email));
-    console.log("CheckInsert Username:", CheckInsert(username));
+    //console.log("Username:", username, "Email:", email)
+    //console.log("Risultato checkUserExist:", checkUserExist(username, email))
+    //console.log("CheckInsert Username:", CheckInsert(username))
 
     fields.forEach(field => {
         if (CheckInsert(field.value)) {
@@ -817,6 +842,7 @@ const printReview = (id) => {
     let recensioneHtml = ""
 
     if (recensione && recensione.valutazione.length > 0) {
+            recensioneHtml += `<h5 class='center-text'>Recensioni</h5>`
         recensione.valutazione.forEach(valutazione => {
             recensioneHtml += `
                 <p>Utente: ${valutazione.utente}</p>
@@ -826,7 +852,7 @@ const printReview = (id) => {
             `
         })
     } else {
-        recensioneHtml = "Ancora nessuna recensione."
+        recensioneHtml = `<h5 class='center-text'>Ancora nessuna recensione.</h5>`
     }
 
     // Controllo se l'utente ha già effettuato una recensione
