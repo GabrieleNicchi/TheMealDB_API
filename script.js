@@ -54,65 +54,79 @@ const fetchAndStoreMealsByIdRange = async (startId, endId) => {
 
 const getMealListStore = (ricerca, name_param) => {
 
-    console.log("script.js: getMealListStore called")
-    const meals = JSON.parse(localStorage.getItem('meals'))
-    let dataMeals = []
+    //console.log("script.js: getMealListStore called")
 
-    if (name_param === "meal") {
-        // Cerca per nome del pasto
-        dataMeals = meals.filter(meal => 
-            meal.strMeal.toLowerCase() === ricerca.toLowerCase() || 
-            meal.strMeal.toLowerCase().includes(ricerca.toLowerCase())
-        )
-
-    } else if (name_param === "ingredient") {
-        // Cerca per ingrediente
-        dataMeals = meals.filter(meal => {
-            for (let i = 1; i <= 20; i++) {
-                if (meal[`strIngredient${i}`] && meal[`strIngredient${i}`].toLowerCase() === ricerca.toLowerCase()) {
-                    return true
+    try{
+        const meals = JSON.parse(localStorage.getItem('meals'))
+        let dataMeals = []
+    
+        if (name_param === "meal") {
+            // Cerca per nome del pasto
+            dataMeals = meals.filter(meal => 
+                meal.strMeal.toLowerCase() === ricerca.toLowerCase() || 
+                meal.strMeal.toLowerCase().includes(ricerca.toLowerCase())
+            )
+    
+        } else if (name_param === "ingredient") {
+            // Cerca per ingrediente
+            dataMeals = meals.filter(meal => {
+                for (let i = 1; i <= 20; i++) {
+                    if (meal[`strIngredient${i}`] && meal[`strIngredient${i}`].toLowerCase() === ricerca.toLowerCase()) {
+                        return true
+                    }
                 }
-            }
-            return false
-        })
-
-    } else if (name_param === "letter") {
-        // Cerca per prima lettera del nome del pasto
-        dataMeals = meals.filter(meal => 
-            meal.strMeal[0].toLowerCase() === ricerca.toLowerCase()
-        )
+                return false
+            })
+    
+        } else if (name_param === "letter") {
+            // Cerca per prima lettera del nome del pasto
+            dataMeals = meals.filter(meal => 
+                meal.strMeal[0].toLowerCase() === ricerca.toLowerCase()
+            )
+        }
+    
+        const mealContainer = document.getElementById('meal-container')
+    
+        // Se ci sono pasti trovati
+        if (dataMeals.length > 0) {
+            printMeal(dataMeals, mealContainer)
+        } else {
+            // Se nessun pasto viene trovato
+            mealContainer.innerHTML = '<p>No meal found.</p>'
+        }
+    } catch (error) {
+        window.location.href = 'error.html'
+        console.log("Error in getMealListStore")
     }
-
-    const mealContainer = document.getElementById('meal-container')
-
-    // Se ci sono pasti trovati
-    if (dataMeals.length > 0) {
-        printMeal(dataMeals, mealContainer)
-    } else {
-        // Se nessun pasto viene trovato
-        mealContainer.innerHTML = '<p>No meal found.</p>'
-    }
+    
 }
 
 const getMealDetailStore = (id) => {
 
-    console.log("script.js: getMealDetailStore called")
-    const meals = JSON.parse(localStorage.getItem('meals'))
-    let dataMeal
+    //console.log("script.js: getMealDetailStore called")
 
-    // Cerca per ID del pasto
-    dataMeal = meals.filter(meal => meal.idMeal === id)
-
-    const mealContainer = document.getElementById('meal-detail')
+    try{
+        const meals = JSON.parse(localStorage.getItem('meals'))
+        let dataMeal
     
+        // Cerca per ID del pasto
+        dataMeal = meals.filter(meal => meal.idMeal === id)
     
-    //mealContainer.innerHTML = ''
-
-    if (dataMeal.length > 0) {
-        printDetailMeal(dataMeal[0], mealContainer)
-    } else {
-        console.log("getMealDetailStore -> no data")
+        const mealContainer = document.getElementById('meal-detail')
+        
+        
+        //mealContainer.innerHTML = ''
+    
+        if (dataMeal.length > 0) {
+            printDetailMeal(dataMeal[0], mealContainer)
+        } else {
+            console.log("getMealDetailStore -> no data")
+        }
+    } catch (error) {
+        window.location.href = 'error.html'
+        console.log("Error in getMealDetailStore")
     }
+    
 }
 
 /* ------------------------------ ELENCO MEAL ------------------------------ */
@@ -144,6 +158,7 @@ const getMealList = ( ricerca , mealContainer , type, ref) => {
 */
 // Funzione di stampa dei pasti
 const printMeal = (data_meal, mealContainer) => {
+
     for (var i = 0; i < data_meal.length; i++) {
         const meal = data_meal[i]
         const prefs = checkFavoriteMeal(meal)
@@ -319,87 +334,100 @@ const checkFavoriteMeal = (meal) => {
 
 const updateFavMeal = (meal, button) => {
 
-    // Recupera l'utente loggato dal session storage
-    const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+    try{
+        // Recupera l'utente loggato dal session storage
+        const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
 
-    if (!utenteLoggato) {
-        alert("Perfavore, effettua il login per vedere i tuoi pasti preferiti")
-        window.location.href = 'login.html'
-        return
+        if (!utenteLoggato) {
+            alert("Perfavore, effettua il login per vedere i tuoi pasti preferiti")
+            window.location.href = 'login.html'
+            return
+        }
+
+        // Controlla se il piatto era tra i preferiti
+        const isFavorite = checkFavoriteMeal(meal)
+
+        if (isFavorite) {
+            // Rimuovi il pasto dai preferiti
+            utenteLoggato.pastiPreferiti = utenteLoggato.pastiPreferiti.filter(p => p.id !== meal.idMeal)
+            button.querySelector('img').src = 'img/heart.svg'; // Cambia l'icona
+        } else {
+            // Aggiungi il pasto ai preferiti
+            utenteLoggato.pastiPreferiti.push({ id: meal.idMeal, commento: '' })
+            button.querySelector('img').src = 'img/heart-fill.svg' // Cambia l'icona
+        }
+
+        // Aggiorna il session storage
+        sessionStorage.setItem('utenteLoggato', JSON.stringify(utenteLoggato))
+
+        // Aggiorna il local storage
+        const utenti = JSON.parse(localStorage.getItem('utenti')) || []
+        const utenteIndex = utenti.findIndex(u => u.email === utenteLoggato.email)
+
+        if (utenteIndex !== -1) {
+            utenti[utenteIndex].pastiPreferiti = utenteLoggato.pastiPreferiti
+            localStorage.setItem('utenti', JSON.stringify(utenti))
+        }
+    } catch (error) {
+        window.location.href = 'error.html'
+        console.log("Error in updateFavMeal")
     }
-
-    // Controlla se il piatto era tra i preferiti
-    const isFavorite = checkFavoriteMeal(meal)
-
-    if (isFavorite) {
-        // Rimuovi il pasto dai preferiti
-        utenteLoggato.pastiPreferiti = utenteLoggato.pastiPreferiti.filter(p => p.id !== meal.idMeal)
-        button.querySelector('img').src = 'img/heart.svg'; // Cambia l'icona
-    } else {
-        // Aggiungi il pasto ai preferiti
-        utenteLoggato.pastiPreferiti.push({ id: meal.idMeal, commento: '' })
-        button.querySelector('img').src = 'img/heart-fill.svg' // Cambia l'icona
-    }
-
-    // Aggiorna il session storage
-    sessionStorage.setItem('utenteLoggato', JSON.stringify(utenteLoggato))
-
-    // Aggiorna il local storage
-    const utenti = JSON.parse(localStorage.getItem('utenti')) || []
-    const utenteIndex = utenti.findIndex(u => u.email === utenteLoggato.email)
-
-    if (utenteIndex !== -1) {
-        utenti[utenteIndex].pastiPreferiti = utenteLoggato.pastiPreferiti
-        localStorage.setItem('utenti', JSON.stringify(utenti))
-    }
+    
 }
 
 const saveNote = (idMeal, commento) => {
-    const utenteLoggatoData = JSON.parse(sessionStorage.getItem('utenteLoggato'))
 
-    // Crea un'istanza della classe Utente
-    const utenteLoggato = new Utente(
-        utenteLoggatoData.username,
-        utenteLoggatoData.email,
-        utenteLoggatoData.password,
-        utenteLoggatoData.paese,
-        utenteLoggatoData.categoria
-    )
+    try{
+        const utenteLoggatoData = JSON.parse(sessionStorage.getItem('utenteLoggato'))
 
-    // Aggiungi i pasti preferiti esistenti all'istanza dell'utente
-    utenteLoggatoData.pastiPreferiti.forEach(pasto => {
-        utenteLoggato.aggiungiPastoPreferito(pasto.id, pasto.commento)
-    })
+        // Crea un'istanza della classe Utente
+        const utenteLoggato = new Utente(
+            utenteLoggatoData.username,
+            utenteLoggatoData.email,
+            utenteLoggatoData.password,
+            utenteLoggatoData.paese,
+            utenteLoggatoData.categoria
+        )
 
+        // Aggiungi i pasti preferiti esistenti all'istanza dell'utente
+        utenteLoggatoData.pastiPreferiti.forEach(pasto => {
+            utenteLoggato.aggiungiPastoPreferito(pasto.id, pasto.commento)
+        })
+
+        
+        //console.log('Pasti preferiti:', utenteLoggato.pastiPreferiti)
+        const pasto = utenteLoggato.pastiPreferiti.find(p => p.id === idMeal.toString())
+        if (!pasto) {
+            console.error(`Pasto con ID ${idMeal} non trovato nei pasti preferiti.`)
+            return
+        }
+
+        // Aggiungi o aggiorna il commento
+        utenteLoggato.aggiungiCommento(idMeal.toString(), commento)
+
+        // Aggiorna il session storage
+        sessionStorage.setItem('utenteLoggato', JSON.stringify(utenteLoggato))
+
+        // Aggiorna il local storage
+        const utenti = JSON.parse(localStorage.getItem('utenti')) || []
+        const utenteIndex = utenti.findIndex(u => u.email === utenteLoggato.email)
+
+        if (utenteIndex !== -1) {
+            utenti[utenteIndex].pastiPreferiti = utenteLoggato.pastiPreferiti
+            localStorage.setItem('utenti', JSON.stringify(utenti))
+        }
+
+        // Aggiorna la visualizzazione della nota
+        const noteContainer = document.querySelector(`#noteContainer-${idMeal}`)
+        noteContainer.innerHTML = `
+            <p>${commento}</p>
+            <button class="btn btn-light edit-note-button" onclick="editNote(${idMeal}, '${commento}')">Modifica Nota</button>
+        `
+    } catch(error){
+        window.location.href = 'error.html'
+        console.log("Error in saveNote: " , error)
+    }
     
-    //console.log('Pasti preferiti:', utenteLoggato.pastiPreferiti)
-    const pasto = utenteLoggato.pastiPreferiti.find(p => p.id === idMeal.toString())
-    if (!pasto) {
-        console.error(`Pasto con ID ${idMeal} non trovato nei pasti preferiti.`)
-        return
-    }
-
-    // Aggiungi o aggiorna il commento
-    utenteLoggato.aggiungiCommento(idMeal.toString(), commento)
-
-    // Aggiorna il session storage
-    sessionStorage.setItem('utenteLoggato', JSON.stringify(utenteLoggato))
-
-    // Aggiorna il local storage
-    const utenti = JSON.parse(localStorage.getItem('utenti')) || []
-    const utenteIndex = utenti.findIndex(u => u.email === utenteLoggato.email)
-
-    if (utenteIndex !== -1) {
-        utenti[utenteIndex].pastiPreferiti = utenteLoggato.pastiPreferiti
-        localStorage.setItem('utenti', JSON.stringify(utenti))
-    }
-
-    // Aggiorna la visualizzazione della nota
-    const noteContainer = document.querySelector(`#noteContainer-${idMeal}`)
-    noteContainer.innerHTML = `
-        <p>${commento}</p>
-        <button class="btn btn-light edit-note-button" onclick="editNote(${idMeal}, '${commento}')">Modifica Nota</button>
-    `
 }
 
 const editNote = (idMeal, commento) => {
@@ -414,41 +442,47 @@ const editNote = (idMeal, commento) => {
 
 const getFavMeal = () => {
 
-    // Recupera l'utente loggato dal session storage
-    const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
-    const mealContainer = document.getElementById('meal-container')
+    try{
+        // Recupera l'utente loggato dal session storage
+        const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+        const mealContainer = document.getElementById('meal-container')
 
-    // Se l'utente non ha salvato alcun piatto
-    // TODO() ********** SISTEMA
-    if(utenteLoggato.pastiPreferiti.length == 0){
-        // Crea l'elemento per ogni pasto
-        const mealElement = document.createElement('div')
-        mealElement.classList.add('meal')
-        
-        // Inserisci il div nella pagina
-        mealElement.innerHTML = `
-            <h2> Nessun piatto tra i preferiti :( </h2>
-        `
-        // Aggiungi ogni pasto al contenitore
-        mealContainer.appendChild(mealElement)
-    }
-
-    // Recupera tutti i pasti dal local storage
-    const meals = JSON.parse(localStorage.getItem('meals'))
-    let dataMeals = []
-
-    // Itera sui pasti preferiti dell'utente
-    for (let i = 0; i < utenteLoggato.pastiPreferiti.length; i++) {
-        const id = utenteLoggato.pastiPreferiti[i].id
-        // Cerca per ID del pasto
-        const meal = meals.find(meal => meal.idMeal === id)
-        if (meal) {
-            dataMeals.push(meal)
+        // Se l'utente non ha salvato alcun piatto
+        // TODO() ********** SISTEMA
+        if(utenteLoggato.pastiPreferiti.length == 0){
+            // Crea l'elemento per ogni pasto
+            const mealElement = document.createElement('div')
+            mealElement.classList.add('meal')
+            
+            // Inserisci il div nella pagina
+            mealElement.innerHTML = `
+                <h2> Nessun piatto tra i preferiti :( </h2>
+            `
+            // Aggiungi ogni pasto al contenitore
+            mealContainer.appendChild(mealElement)
         }
-    }
 
-    // Stampa i pasti preferiti
-    printMealPrefs(dataMeals, mealContainer )
+        // Recupera tutti i pasti dal local storage
+        const meals = JSON.parse(localStorage.getItem('meals'))
+        let dataMeals = []
+
+        // Itera sui pasti preferiti dell'utente
+        for (let i = 0; i < utenteLoggato.pastiPreferiti.length; i++) {
+            const id = utenteLoggato.pastiPreferiti[i].id
+            // Cerca per ID del pasto
+            const meal = meals.find(meal => meal.idMeal === id)
+            if (meal) {
+                dataMeals.push(meal)
+            }
+        }
+
+        // Stampa i pasti preferiti
+        printMealPrefs(dataMeals, mealContainer )
+    } catch (error) {
+        window.location.href = 'error.html'
+        console.log("Error in getFavMeal: " , error)
+    }
+    
 }
 
 // Funzione dei pasti preferiti del ricettario
@@ -587,7 +621,7 @@ const checkFormMeal = (value) => {
         }
         return true
     } else {
-        console.log("Qualcosa è andato storto")
+        //console.log("Qualcosa è andato storto")
         return false
     }
 
@@ -704,53 +738,64 @@ class PastiPreferiti {
 const register = () => {
 
     
+    try{
+        const username = document.getElementById('nome_utente').value
+        const email = document.getElementById('email').value
+        const password = document.getElementById('password').value
+        const paese = document.getElementById('paese').value
+        const categoria = document.getElementById('categoria').value
 
-    const username = document.getElementById('nome_utente').value
-    const email = document.getElementById('email').value
-    const password = document.getElementById('password').value
-    const paese = document.getElementById('paese').value
-    const categoria = document.getElementById('categoria').value
+        if(checkRegister(username, email, password, paese)) {
+            const nuovoUtente = new Utente(username, email, password, paese, categoria)
 
-    if(checkRegister(username, email, password, paese)) {
-        const nuovoUtente = new Utente(username, email, password, paese, categoria)
+            let utenti = JSON.parse(localStorage.getItem('utenti')) || []
+            utenti.push(nuovoUtente)
+            localStorage.setItem('utenti', JSON.stringify(utenti))
 
-        let utenti = JSON.parse(localStorage.getItem('utenti')) || []
-        utenti.push(nuovoUtente)
-        localStorage.setItem('utenti', JSON.stringify(utenti))
+            window.location.href = 'login.html'
+            alert('Utente registrato!')
+        }
 
-        window.location.href = 'login.html'
-        alert('Utente registrato!')
+        return false
+    } catch (error) {
+        window.location.href = 'error.html'
+        console.log("Error in register: " , error)
     }
-
-    return false
+    
 
 }
 
 const login = () => {
 
-    const utenza = document.getElementById('email').value
-    const password = document.getElementById('password').value
+    try{
+        const utenza = document.getElementById('email').value
+        const password = document.getElementById('password').value
 
-    // Recupera l'array di utenti dal LocalStorage
-    const utenti = JSON.parse(localStorage.getItem('utenti')) || []
+        // Recupera l'array di utenti dal LocalStorage
+        const utenti = JSON.parse(localStorage.getItem('utenti')) || []
 
-    // Cerca l'utente che corrisponde all'email o al nome utente e alla password
-    const utente = utenti.find(user => 
-        (user.email === utenza || user.username === utenza) && user.password === password
-    )
+        // Cerca l'utente che corrisponde all'email o al nome utente e alla password
+        const utente = utenti.find(user => 
+            (user.email === utenza || user.username === utenza) && user.password === password
+        )
 
-    if (utente) {
-        // Salva l'utente nel SessionStorage
-        sessionStorage.setItem('utenteLoggato', JSON.stringify(utente))
-        alert(`Login effettuato con successo! Ciao ${utente.username}`)
+        if (utente) {
+            // Salva l'utente nel SessionStorage
+            sessionStorage.setItem('utenteLoggato', JSON.stringify(utente))
+            alert(`Login effettuato con successo! Ciao ${utente.username}`)
 
-        // Reindirizza alla pagina principale o alla dashboard
-        window.location.href = 'index.html'
-    } else {
-        // Gestisci il caso in cui l'utente non venga trovato
-        alert('Email o password non corretti, per favore, riprova')
+            // Reindirizza alla pagina principale o alla dashboard
+            window.location.href = 'index.html'
+        } else {
+            // Gestisci il caso in cui l'utente non venga trovato
+            alert('Email o password non corretti, per favore, riprova')
+        }
+        return false
+    } catch (error) {
+        window.location.href = 'error.html'
+        console.log("Error in register: " , error)
     }
-    return false
+    
 }
 
 const checkUserLogged = () => {
@@ -835,19 +880,18 @@ class Valutazione {
 // Funzione per stampare tutte le recensioni dato un piatto
 const printReview = (id) => {
 
-    // Prendi le recensioni dal Local Storage
     const recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
     let recensione = recensioni.find(review => review.idPasto === id)
 
     let recensioneHtml = ""
 
     if (recensione && recensione.valutazioni.length > 0) {
-        recensioneHtml += `<h5 class='center-text'>Recensioni</h5>`;
+        recensioneHtml += `<h5 class='center-text'>Recensioni</h5>`
         recensione.valutazioni.forEach(valutazione => {
             recensioneHtml += `
                 <p><h5><img src="img/person-circle.svg" alt="Utente Icon" width="40" height="40" class='my-4'> ${valutazione.utente}</h5></p>
-                <p>Valutazione Gusto: ${valutazione.rankGusto}</p>
-                <p>Valutazione Difficoltà: ${valutazione.rankDifficolta}</p>
+                <p>Gusto: ${generateStars(valutazione.rankGusto)}</p>
+                <p>Difficoltà: ${generateStars(valutazione.rankDifficolta)}</p>
                 <p>Commento: ${valutazione.commento}</p>
                 <hr>
             `
@@ -856,15 +900,28 @@ const printReview = (id) => {
         recensioneHtml = `<h5 class='center-text'>Ancora nessuna recensione.</h5>`
     }
 
-    // Controllo se l'utente ha già effettuato una recensione
     const hasReviewed = hasUserLeftReview(id)
 
     recensioneHtml += `
         <button class="btn btn-light review-button">${hasReviewed ? 'Modifica recensione' : 'Lascia una recensione'}</button>
         <div id="reviewContainer-${id}" style="display:none;">
             <textarea id="reviewText-${id}" rows="4" cols="50" placeholder="Scrivi la tua recensione qui..."></textarea><br>
-            <input type="number" id="reviewRankGusto-${id}" min="1" max="5" placeholder="Valutazione Gusto (1-5)">
-            <input type="number" id="reviewRankDifficolta-${id}" min="1" max="5" placeholder="Valutazione Difficoltà (1-5)">
+            <div id="star-rating-gusto-${id}">
+                <img src="img/star.svg" class="star" data-value="1">
+                <img src="img/star.svg" class="star" data-value="2">
+                <img src="img/star.svg" class="star" data-value="3">
+                <img src="img/star.svg" class="star" data-value="4">
+                <img src="img/star.svg" class="star" data-value="5">
+            </div>
+            <span id="rating-value-gusto-${id}">0</span><br>
+            <div id="star-rating-difficolta-${id}">
+                <img src="img/star.svg" class="star" data-value="1">
+                <img src="img/star.svg" class="star" data-value="2">
+                <img src="img/star.svg" class="star" data-value="3">
+                <img src="img/star.svg" class="star" data-value="4">
+                <img src="img/star.svg" class="star" data-value="5">
+            </div>
+            <span id="rating-value-difficolta-${id}">0</span><br>
             <button class="btn btn-light" onclick="${hasReviewed ? `editReview(${id})` : `placeReview(${id})`}">${hasReviewed ? 'Modifica Recensione' : 'Invia Recensione'}</button>
         </div>
     `
@@ -874,53 +931,47 @@ const printReview = (id) => {
 
 // Funzione per piazzare una nuova recensione dell'utente loggato
 const placeReview = (idMeal) => {
+    
+    //console.log("placeReview called")
 
-    console.log("placeReview called")
+    try{
+        const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
 
-    const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+        if (!utenteLoggato) {
+            alert("Perfavore, effettua il login per lasciare una recensione")
+            window.location.href = 'login.html'
+            return
+        }
 
-    if (!utenteLoggato) {
-        alert("Perfavore, effettua il login per lasciare una recensione")
-        window.location.href = 'login.html'
-        return
+        const commento = document.getElementById('overlay-reviewText').value
+        const rankGusto = parseFloat(document.getElementById('rating-value-gusto').textContent)
+        const rankDifficolta = parseFloat(document.getElementById('rating-value-difficolta').textContent)
+
+        if (!commento || !rankGusto || !rankDifficolta) {
+            alert("Perfavore, inserisci sia una valutazione che un commento")
+            return
+        }
+
+        let recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+        recensioni = recensioni.map(review => Object.assign(new Recensione(), review))
+
+        let recensione = recensioni.find(review => review.idPasto === idMeal)
+
+        if (!recensione) {
+            recensione = new Recensione(idMeal)
+            recensioni.push(recensione)
+        }
+
+        recensione.aggiungiValutazione(utenteLoggato.username, rankGusto, rankDifficolta, commento)
+        localStorage.setItem('recensioni', JSON.stringify(recensioni))
+
+        document.getElementById('review-overlay').style.display = 'none'
+        document.getElementById('review').innerHTML = printReview(idMeal)
+        window.location.reload()
+    } catch (error) {
+        window.location.href = 'error.html'
+        console.log("Error in placeReview: " , error) 
     }
-
-    // Recupero i dati dell'overlay
-    const commento = document.getElementById('overlay-reviewText').value
-    const rankGusto = document.getElementById('overlay-reviewRankGusto').value
-    const rankDifficolta = document.getElementById('overlay-reviewRankDifficolta').value
-
-    if (!commento || !rankGusto || !rankDifficolta) {
-        alert("Perfavore, inserisci sia una valutazione che un commento")
-        return
-    }
-
-    // Prendi le recensioni dal Local Storage
-    let recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
-
-    // Mappo le recensioni in modo che riflettano un oggetto di tipo Recensione()
-    recensioni = recensioni.map(review => Object.assign(new Recensione(), review))
-
-    let recensione = recensioni.find(review => review.idPasto === idMeal)
-
-    // Creo la nuova istanza recensione, se non esiste
-    if (!recensione) {
-        recensione = new Recensione(idMeal)
-        recensioni.push(recensione)
-    }
-
-    // Aggiungo la nuova recensione all'array per l'idPasto = idMeal
-    recensione.aggiungiValutazione(utenteLoggato.username, rankGusto, rankDifficolta, commento)
-
-    // Aggiorna il local storage
-    localStorage.setItem('recensioni', JSON.stringify(recensioni))
-
-    // Aggiorna la visualizzazione delle recensioni
-    document.getElementById('review-overlay').style.display = 'none'
-    document.getElementById('review').innerHTML = printReview(idMeal)
-
-    // Ricarica la pagina
-    window.location.reload()
 }
 
 // Controlla se: o nessuno è loggato o l'utente loggato non ha effettuato ancora nessuna recensione sul piatto
@@ -951,45 +1002,99 @@ const hasUserLeftReview = (idMeal) => {
 
 const editReview = (idMeal) => {
 
-    console.log("editReview called")
+    //console.log("editReview called")
 
-    const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+    try{
+        const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
 
-    // Recupero i dati dell'overlay
-    const commento = document.getElementById('overlay-reviewText').value
-    const rankGusto = document.getElementById('overlay-reviewRankGusto').value
-    const rankDifficolta = document.getElementById('overlay-reviewRankDifficolta').value
+        const commento = document.getElementById('overlay-reviewText').value;
+        const rankGusto = parseFloat(document.getElementById('rating-value-gusto').textContent)
+        const rankDifficolta = parseFloat(document.getElementById('rating-value-difficolta').textContent)
 
-    if (!commento || !rankGusto || !rankDifficolta) {
-        alert("Perfavore, inserisci sia una valutazione che un commento")
-        return
+        if (!commento || !rankGusto || !rankDifficolta) {
+            alert("Perfavore, inserisci sia una valutazione che un commento")
+            return
+        }
+
+        let recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+        recensioni = recensioni.map(review => Object.assign(new Recensione(), review))
+
+        let recensione = recensioni.find(review => review.idPasto === idMeal)
+
+        if (recensione) {
+            recensione.modificaValutazione(utenteLoggato.username, rankGusto, rankDifficolta, commento);
+            localStorage.setItem('recensioni', JSON.stringify(recensioni))
+
+            document.getElementById('review-overlay').style.display = 'none'
+            document.getElementById('review').innerHTML = printReview(idMeal)
+            window.location.reload();
+        } else {
+            console.error(`Recensione per il pasto con ID ${idMeal} non trovata.`)
+        }
+    } catch(error) {
+        window.location.href = 'error.html'
+        console.log("Error in editReview: " , error) 
     }
+    
+}
 
-    // Prendi le recensioni dal Local Storage
-    let recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+function setupStarRating(starContainerId, ratingValueId) {
 
-    // Mappo le recensioni in modo che riflettano un oggetto di tipo Recensione()
-    recensioni = recensioni.map(review => Object.assign(new Recensione(), review))
+    const stars = document.querySelectorAll(`#${starContainerId} .star`)
+    const ratingValue = document.getElementById(ratingValueId)
 
-    // Recupera la recensione del pasto corrispondente
-    let recensione = recensioni.find(review => review.idPasto === idMeal)
+    stars.forEach(star => {
+        star.addEventListener('click', function(event) {
+            // Ottieni il valore numerico della stella cliccata
+            const value = parseFloat(event.target.getAttribute('data-value'))
+            
+            // Calcola la posizione del clic rispetto alla larghezza della stella
+            const rect = event.target.getBoundingClientRect()
+            const x = event.clientX - rect.left // Posizione del clic rispetto al bordo sinistro
+            const width = rect.width// Larghezza totale della stella
+            
+            // Determina il voto (mezzo o pieno) in base al punto cliccato
+            const isHalf = x < width / 2
+            const rating = isHalf ? value - 0.5 : value
 
-    if (recensione) {
-        // Modifico la recensione
-        recensione.modificaValutazione(utenteLoggato.username, rankGusto, rankDifficolta, commento)
+            // Aggiorna il valore visualizzato
+            ratingValue.textContent = rating.toFixed(1)
 
-        // Aggiorna il local storage
-        localStorage.setItem('recensioni', JSON.stringify(recensioni))
+            // Aggiorna graficamente le stelle
+            updateStars(stars, rating)
+        })
+    })
+}
 
-        // Aggiorna la visualizzazione delle recensioni
-        document.getElementById('review-overlay').style.display = 'none'
-        document.getElementById('review').innerHTML = printReview(idMeal)
+function updateStars(stars, rating) {
+    stars.forEach(star => {
+        const value = parseFloat(star.getAttribute('data-value'))
 
-        // Ricarica la pagina
-        window.location.reload()
-    } else {
-        console.error(`Recensione per il pasto con ID ${idMeal} non trovata.`)
+        if (value <= rating) {
+            // Stella piena
+            star.src = 'img/star-fill.svg'
+        } else if (value - 0.5 === rating) {
+            // Stella a metà
+            star.src = 'img/star-half.svg'
+        } else {
+            // Stella vuota
+            star.src = 'img/star.svg'
+        }
+    })
+}
+
+function generateStars(rating) {
+    let starsHtml = ''
+    for (let i = 1; i <= 5; i++) {
+        if (i <= rating) {
+            starsHtml += '<img src="img/star-fill.svg" class="star-no-pointer">'
+        } else if (i - 0.5 === rating) {
+            starsHtml += '<img src="img/star-half.svg" class="star-no-pointer">'
+        } else {
+            starsHtml += '<img src="img/star.svg" class="star-no-pointer">'
+        }
     }
+    return starsHtml
 }
 
 

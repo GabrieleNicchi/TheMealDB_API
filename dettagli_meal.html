@@ -65,8 +65,26 @@
         <div class="overlay-content">
             <button class="btn-close-overlay" id="close-overlay">&times;</button>
             <textarea id="overlay-reviewText" rows="4" cols="50" placeholder="Scrivi la tua recensione qui..."></textarea><br>
-            <p> Valutazione gusto: <input type="number" id="overlay-reviewRankGusto" min="1" max="5" placeholder="Valutazione Gusto"></p><br>
-            <p> Valutazione difficoltà:<input type="number" id="overlay-reviewRankDifficolta" min="1" max="5" placeholder="Valutazione Difficoltà"></p><br>
+            <p> Gusto: 
+                <div id="star-rating-gusto">
+                    <img src="img/star.svg" class="star" data-value="1">
+                    <img src="img/star.svg" class="star" data-value="2">
+                    <img src="img/star.svg" class="star" data-value="3">
+                    <img src="img/star.svg" class="star" data-value="4">
+                    <img src="img/star.svg" class="star" data-value="5">
+                </div>
+                <span id="rating-value-gusto">0</span>
+            </p><br>
+            <p> Difficoltà:
+                <div id="star-rating-difficolta">
+                    <img src="img/star.svg" class="star" data-value="1">
+                    <img src="img/star.svg" class="star" data-value="2">
+                    <img src="img/star.svg" class="star" data-value="3">
+                    <img src="img/star.svg" class="star" data-value="4">
+                    <img src="img/star.svg" class="star" data-value="5">
+                </div>
+                <span id="rating-value-difficolta">0</span>
+            </p><br>
             <button class="btn btn-light" id="submit-review">Invia Recensione</button>
         </div>
     </div>
@@ -151,7 +169,8 @@
             } else {
                 //Errore
             }
-
+            setupStarRating('star-rating-gusto', 'rating-value-gusto')
+            setupStarRating('star-rating-difficolta', 'rating-value-difficolta')
             // Dettagli (API)
             /*
             if (ricerca) {

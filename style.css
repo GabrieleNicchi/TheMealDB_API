@@ -1,7 +1,15 @@
 /* ----------------------- ! Base style ----------------------- */
     body{font-family: 'Inter', sans-serif; font-size: 16px; background-color: #fafafa;}
 
-    a{text-decoration: none;}
+    a {
+        text-decoration: none;
+        color: purple;
+    }
+    
+    a:hover {
+        text-decoration: underline;
+        color: purple; 
+    }
 
     .center-text{text-align: center;}
 
@@ -247,6 +255,37 @@
     .my-4 {
         margin-bottom: 1px;
         margin-right: 8px;
+    }
+
+    #star-rating-gusto, #star-rating-difficolta {
+        display: flex;
+        flex-direction: row;
+        margin-left:170px;
+    }
+    
+    .star {
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+    }
+
+    .star-no-pointer{
+        width: 30px;
+        height: 30px;
+        margin: 1px;
+    }
+    
+    .star:hover,
+    .star:hover ~ .star {
+        content: url('star-fill.svg');
+    }
+    
+    .star.half::after {
+        content: url('star-half.svg');
+        position: absolute;
+        width: 20px;
+        height: 40px;
+        overflow: hidden;
     }
 
     /* ------------------------ Pasti ------------------------ */
@@ -620,4 +659,27 @@
         min-height:100%;
         z-index: 0;
         }
+
+
+    /* Error */
+
+    .error-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        text-align: center;
+    }
+    .error-container img {
+        max-width: 100%;
+        height: auto;
+    }
+    .error-container a {
+        margin-top: 20px;
+        font-size: 18px;
+    }
+    .error-container a:hover {
+        text-decoration: underline;
+    }
 
