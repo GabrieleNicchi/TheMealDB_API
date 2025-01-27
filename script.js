@@ -224,22 +224,21 @@ const printDetailMeal = (meal, mealContainer) => {
                     <img src="img/${prefs ? 'heart-fill' : 'heart'}.svg" alt="Icona preferiti" width="30" height="30">
                 </button>
 
-                <!-- Contenuto organizzato in righe con colonne affiancate -->
                 <div class='row w-100 mt-4'>
-                    <!-- Colonna Istruzioni (prende più spazio) -->
+                    <!-- Colonna Istruzioni -->
                     <div class='col-lg-6 col-md-12 d-flex flex-column align-items-center text-center'>
-                        <p><h3>Istruzioni:</h3> ${meal.strInstructions}</p>
+                        <p><h3><img src="img/book-half.svg" alt="Istruzioni Icon" width="24" height="24"> Istruzioni:</h3> ${meal.strInstructions}</p>
                     </div>
 
                     <!-- Colonna Categoria e Area -->
                     <div class='col-lg-3 col-md-6 d-flex flex-column align-items-center text-center'>
-                        <p><h3>Categoria:</h3> ${meal.strCategory}</p>
-                        <p><h3>Area:</h3> ${meal.strArea}</p>
+                        <p><h3> Categoria:</h3> ${meal.strCategory}</p>
+                        <p><h3> Area:</h3> ${meal.strArea}</p>
                     </div>
 
                     <!-- Colonna Ingredienti -->
                     <div class='col-lg-3 col-md-6 d-flex flex-column align-items-center text-center'>
-                        <p><h3>Ingredienti:</h3></p>
+                        <p><h3><img src="img/inboxes-fill.svg" alt="Ingredienti Icon" width="24" height="24"> Ingredienti:</h3></p>
                         <div id="ingredients">${append_ingredients(meal)}</div>
                     </div>
                 </div>
@@ -799,54 +798,56 @@ const checkUserLogged = () => {
 
 /* ------------------------------ RECENSIONI ------------------------------ */
 
-class Recensione{
+class Recensione {
     constructor(idPasto) {
         this.idPasto = idPasto
-        this.valutazione = []
+        this.valutazioni = []
     }
 
     // Metodo per aggiungere una nuova valutazione ad un piatto
-    aggiungiValutazione(utente, rank, commento) {
-        const valutazione = new Valutazione(utente, rank, commento)
-        this.valutazione.push(valutazione)
+    aggiungiValutazione(utente, rankGusto, rankDifficolta, commento) {
+        const valutazione = new Valutazione(utente, rankGusto, rankDifficolta, commento)
+        this.valutazioni.push(valutazione)
     }
 
     // Metodo per modificare una valutazione esistente
-    modificaValutazione(utente, rank, commento) {
-        const valutazione = this.valutazione.find(v => v.utente === utente)
+    modificaValutazione(utente, rankGusto, rankDifficolta, commento) {
+        const valutazione = this.valutazioni.find(v => v.utente === utente)
         if (valutazione) {
-            valutazione.rank = rank
+            valutazione.rankGusto = rankGusto
+            valutazione.rankDifficolta = rankDifficolta
             valutazione.commento = commento
         } else {
             console.log(`Valutazione per l'utente ${utente} non trovata.`)
         }
     }
 }
-class Valutazione{
 
-    constructor(utente, rank, commento){
-
+class Valutazione {
+    constructor(utente, rankGusto, rankDifficolta, commento) {
         this.utente = utente
-        this.rank = rank
+        this.rankGusto = rankGusto
+        this.rankDifficolta = rankDifficolta
         this.commento = commento
-
     }
 }
 
 // Funzione per stampare tutte le recensioni dato un piatto
 const printReview = (id) => {
+
     // Prendi le recensioni dal Local Storage
     const recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
     let recensione = recensioni.find(review => review.idPasto === id)
 
     let recensioneHtml = ""
 
-    if (recensione && recensione.valutazione.length > 0) {
-            recensioneHtml += `<h5 class='center-text'>Recensioni</h5>`
-        recensione.valutazione.forEach(valutazione => {
+    if (recensione && recensione.valutazioni.length > 0) {
+        recensioneHtml += `<h5 class='center-text'>Recensioni</h5>`;
+        recensione.valutazioni.forEach(valutazione => {
             recensioneHtml += `
-                <p>Utente: ${valutazione.utente}</p>
-                <p>Valutazione: ${valutazione.rank}</p>
+                <p><h5><img src="img/person-circle.svg" alt="Utente Icon" width="40" height="40" class='my-4'> ${valutazione.utente}</h5></p>
+                <p>Valutazione Gusto: ${valutazione.rankGusto}</p>
+                <p>Valutazione Difficoltà: ${valutazione.rankDifficolta}</p>
                 <p>Commento: ${valutazione.commento}</p>
                 <hr>
             `
@@ -856,14 +857,14 @@ const printReview = (id) => {
     }
 
     // Controllo se l'utente ha già effettuato una recensione
-    // 'false' -> Lascia una recensione , placeReview() , Invia recensione
     const hasReviewed = hasUserLeftReview(id)
 
     recensioneHtml += `
         <button class="btn btn-light review-button">${hasReviewed ? 'Modifica recensione' : 'Lascia una recensione'}</button>
         <div id="reviewContainer-${id}" style="display:none;">
             <textarea id="reviewText-${id}" rows="4" cols="50" placeholder="Scrivi la tua recensione qui..."></textarea><br>
-            <input type="number" id="reviewRank-${id}" min="1" max="5" placeholder="Valutazione (1-5)">
+            <input type="number" id="reviewRankGusto-${id}" min="1" max="5" placeholder="Valutazione Gusto (1-5)">
+            <input type="number" id="reviewRankDifficolta-${id}" min="1" max="5" placeholder="Valutazione Difficoltà (1-5)">
             <button class="btn btn-light" onclick="${hasReviewed ? `editReview(${id})` : `placeReview(${id})`}">${hasReviewed ? 'Modifica Recensione' : 'Invia Recensione'}</button>
         </div>
     `
@@ -886,9 +887,10 @@ const placeReview = (idMeal) => {
 
     // Recupero i dati dell'overlay
     const commento = document.getElementById('overlay-reviewText').value
-    const rank = document.getElementById('overlay-reviewRank').value
+    const rankGusto = document.getElementById('overlay-reviewRankGusto').value
+    const rankDifficolta = document.getElementById('overlay-reviewRankDifficolta').value
 
-    if (!commento || !rank) {
+    if (!commento || !rankGusto || !rankDifficolta) {
         alert("Perfavore, inserisci sia una valutazione che un commento")
         return
     }
@@ -896,19 +898,19 @@ const placeReview = (idMeal) => {
     // Prendi le recensioni dal Local Storage
     let recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
 
-    // Mappo le recensioni in modo che riflettano un oggetto di tipo Recensione() 
+    // Mappo le recensioni in modo che riflettano un oggetto di tipo Recensione()
     recensioni = recensioni.map(review => Object.assign(new Recensione(), review))
 
     let recensione = recensioni.find(review => review.idPasto === idMeal)
 
-    // Creo la nuova istanza recensione , se non esiste
+    // Creo la nuova istanza recensione, se non esiste
     if (!recensione) {
         recensione = new Recensione(idMeal)
         recensioni.push(recensione)
     }
 
     // Aggiungo la nuova recensione all'array per l'idPasto = idMeal
-    recensione.aggiungiValutazione(utenteLoggato.username, rank, commento)
+    recensione.aggiungiValutazione(utenteLoggato.username, rankGusto, rankDifficolta, commento)
 
     // Aggiorna il local storage
     localStorage.setItem('recensioni', JSON.stringify(recensioni))
@@ -937,7 +939,7 @@ const hasUserLeftReview = (idMeal) => {
 
     if (recensione) {
         // Itera tra le valutazioni della recensione
-        for (let valutazione of recensione.valutazione) {
+        for (let valutazione of recensione.valutazioni) {
             if (valutazione.utente === utenteLoggato.username) {
                 return true
             }
@@ -951,16 +953,14 @@ const editReview = (idMeal) => {
 
     console.log("editReview called")
 
-    // Non serve effettuare il controllo sull'utente loggato perché arrivare richiamare questa funzione implica implicitamente
-    // che c'è un utente loggato e inoltre che ha già effettuato una recensione
-
     const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
 
     // Recupero i dati dell'overlay
     const commento = document.getElementById('overlay-reviewText').value
-    const rank = document.getElementById('overlay-reviewRank').value
+    const rankGusto = document.getElementById('overlay-reviewRankGusto').value
+    const rankDifficolta = document.getElementById('overlay-reviewRankDifficolta').value
 
-    if (!commento || !rank) {
+    if (!commento || !rankGusto || !rankDifficolta) {
         alert("Perfavore, inserisci sia una valutazione che un commento")
         return
     }
@@ -968,7 +968,7 @@ const editReview = (idMeal) => {
     // Prendi le recensioni dal Local Storage
     let recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
 
-    // Mappo le recensioni in modo che riflettano un oggetto di tipo Recensione() 
+    // Mappo le recensioni in modo che riflettano un oggetto di tipo Recensione()
     recensioni = recensioni.map(review => Object.assign(new Recensione(), review))
 
     // Recupera la recensione del pasto corrispondente
@@ -976,7 +976,7 @@ const editReview = (idMeal) => {
 
     if (recensione) {
         // Modifico la recensione
-        recensione.modificaValutazione(utenteLoggato.username, rank, commento)
+        recensione.modificaValutazione(utenteLoggato.username, rankGusto, rankDifficolta, commento)
 
         // Aggiorna il local storage
         localStorage.setItem('recensioni', JSON.stringify(recensioni))

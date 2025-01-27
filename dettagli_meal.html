@@ -60,13 +60,14 @@
 
     <div id="meal-detail"></div>
 
-    <!-- OVERLAY REVIEW-->
+    <!-- OVERLAY REVIEW -->
     <div id="review-overlay" style="display:none;">
         <div class="overlay-content">
+            <button class="btn-close-overlay" id="close-overlay">&times;</button>
             <textarea id="overlay-reviewText" rows="4" cols="50" placeholder="Scrivi la tua recensione qui..."></textarea><br>
-            <input type="number" id="overlay-reviewRank" min="1" max="5" placeholder="Valutazione (1-5)">
+            <p> Valutazione gusto: <input type="number" id="overlay-reviewRankGusto" min="1" max="5" placeholder="Valutazione Gusto"></p><br>
+            <p> Valutazione difficoltà:<input type="number" id="overlay-reviewRankDifficolta" min="1" max="5" placeholder="Valutazione Difficoltà"></p><br>
             <button class="btn btn-light" id="submit-review">Invia Recensione</button>
-            <button class="btn btn-light" id="close-overlay">Chiudi</button>
         </div>
     </div>
 
