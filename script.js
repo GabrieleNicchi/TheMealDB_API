@@ -28,7 +28,7 @@ const fetchAndStoreMealsByIdRange = async (startId, endId) => {
 
         // Controlla se i dati sono già presenti nel LocalStorage
         if (localStorage.getItem('meals')) {
-            console.log('I dati sono già presenti nel LocalStorage.')
+            //console.log('I dati sono già presenti nel LocalStorage.')
             return
         }
 
@@ -182,7 +182,7 @@ const printMeal = (data_meal, mealContainer) => {
 
         // Aggiungi l'event listener al bottone dei preferiti
         mealElement.querySelector('.fav-button').addEventListener('click', (event) => {
-            event.stopPropagation() // Evita che il click sul pulsante favorisca la navigazione
+            event.stopPropagation() 
             updateFavMeal(meal, mealElement.querySelector('.fav-button'))
         })
 
@@ -448,7 +448,6 @@ const getFavMeal = () => {
         const mealContainer = document.getElementById('meal-container')
 
         // Se l'utente non ha salvato alcun piatto
-        // TODO() ********** SISTEMA
         if(utenteLoggato.pastiPreferiti.length == 0){
             // Crea l'elemento per ogni pasto
             const mealElement = document.createElement('div')
