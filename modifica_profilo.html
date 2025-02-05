@@ -21,24 +21,33 @@
             <div id="user-profile-info">
                 <!-- Qui verranno mostrati i dati dell'utente loggato -->
             </div>
+
             <button id="edit-info-button" class="btn btn-primary">Modifica le tue informazioni</button>
+            <p></p>
+            <button id="delete-info-button" class="btn btn-primary">Elimina il profilo</button>
+            <p></p>
+            <a href = "index.html">Torna alla home</a>
     
             <div id="edit-info-form" style="display:none;">
                 <form id="user-form">
                     <div class="form-group">
+                        <div id="errorMessageemail" class="error-message"></div>
                         <label for="email">Indirizzo mail:</label>
                         <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Inserisci la tua e-mail">
                         <small id="emailHelp" class="form-text text-muted">Non condivideremo mai la tua mail con nessuno.</small>
                     </div>
                     <div class="form-group">
+                        <div id="errorMessagepassword" class="error-message"></div>
                         <label for="password">Password:</label>
                         <input type="password" class="form-control" id="password" placeholder="Password">
                     </div>
                     <div class="form-group">
+                        <div id="errorMessagenome_utente" class="error-message"></div>
                         <label for="nome_utente">Nome utente:</label>
                         <input type="text" class="form-control" id="nome_utente" placeholder="Inserisci il tuo nome utente">
                     </div>
                     <div class="form-group">
+                        <div id="errorMessagepaese" class="error-message"></div>
                         <label for="paese">Paese:</label>
                         <input type="text" class="form-control" id="paese" placeholder="Inserisci il tuo paese">
                     </div>
@@ -69,79 +78,17 @@
         <script>
             document.addEventListener("DOMContentLoaded", function() {
 
-
-                alert("Solo per testing, non rientra nelle funzionalità della pagina")
-
                 const userInfoElement = document.getElementById('user-profile-info')
                 const editInfoButton = document.getElementById('edit-info-button')
                 const editInfoForm = document.getElementById('edit-info-form')
+                const deleteInfoButton = document.getElementById('delete-info-button')
                 const userForm = document.getElementById('user-form')
-    
-                // Recupera i dati dell'utente loggato dal session storage
-                const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
-    
-                if (utenteLoggato) {
-                    // Mostra i dati dell'utente loggato
-                    userInfoElement.innerHTML = `
-                        <p><img src="img/envelope-at-fill.svg" alt="Email Icon" width="24" height="24"> Email: ${utenteLoggato.email}</p>
-                        <p><img src="img/incognito.svg" alt="Password Icon" width="24" height="24"> Password: ${utenteLoggato.password}</p>
-                        <p><img src="img/person-vcard-fill.svg" alt="Username Icon" width="24" height="24"> Nome utente: ${utenteLoggato.username}</p>
-                        <p><img src="img/geo-fill.svg" alt="Country Icon" width="24" height="24"> Paese: ${utenteLoggato.paese}</p>
-                        <p><img src="img/egg-fried.svg" alt="Category Icon" width="24" height="24"> Categoria preferita: ${utenteLoggato.categoria}</p>
-                    `
-    
-                    // Precompila il form con i dati dell'utente loggato
-                    document.getElementById('email').value = utenteLoggato.email
-                    document.getElementById('password').value = utenteLoggato.password
-                    document.getElementById('nome_utente').value = utenteLoggato.username
-                    document.getElementById('paese').value = utenteLoggato.paese
-                    document.getElementById('categoria').value = utenteLoggato.categoria
-                }
-    
-                // Mostra il form di modifica quando si clicca sul pulsante
-                editInfoButton.addEventListener('click', () => {
-                    userInfoElement.style.display = 'none'
-                    editInfoButton.style.display = 'none'
-                    editInfoForm.style.display = 'block'
-                })
-    
-                // Gestisci l'invio del form
-                userForm.addEventListener('submit', (event) => {
-                    event.preventDefault()
-    
-                    // Aggiorna i dati dell'utente
-                    utenteLoggato.email = document.getElementById('email').value
-                    utenteLoggato.password = document.getElementById('password').value
-                    utenteLoggato.username = document.getElementById('nome_utente').value
-                    utenteLoggato.paese = document.getElementById('paese').value
-                    utenteLoggato.categoria = document.getElementById('categoria').value
-    
-                    // Aggiorna il session storage
-                    sessionStorage.setItem('utenteLoggato', JSON.stringify(utenteLoggato))
-    
-                    // Aggiorna il local storage
-                    const utenti = JSON.parse(localStorage.getItem('utenti')) || []
-                    const utenteIndex = utenti.findIndex(u => u.email === utenteLoggato.email)
-    
-                    if (utenteIndex !== -1) {
-                        utenti[utenteIndex] = utenteLoggato
-                        localStorage.setItem('utenti', JSON.stringify(utenti))
-                    }
-    
-                    // Aggiorna la visualizzazione dei dati dell'utente
-                    userInfoElement.innerHTML = `
-                        <p><img src="img/envelope-at-fill.svg" alt="Email Icon" width="24" height="24"> Email: ${utenteLoggato.email}</p>
-                        <p><img src="img/incognito.svg" alt="Password Icon" width="24" height="24"> Password: ${utenteLoggato.password}</p>
-                        <p><img src="img/person-vcard-fill.svg" alt="Username Icon" width="24" height="24"> Nome utente: ${utenteLoggato.username}</p>
-                        <p><img src="img/geo-fill.svg" alt="Country Icon" width="24" height="24"> Paese: ${utenteLoggato.paese}</p>
-                        <p><img src="img/egg-fried.svg" alt="Category Icon" width="24" height="24"> Categoria preferita: ${utenteLoggato.categoria}</p>
-                    `
-    
-                    // Nascondi il form di modifica e mostra le informazioni aggiornate
-                    editInfoForm.style.display = 'none'
-                    userInfoElement.style.display = 'block'
-                    editInfoButton.style.display = 'block'
-                })
+
+                fetchUserData(userInfoElement)
+
+                editInfoButton.addEventListener('click', () => showEditForm(userInfoElement, editInfoButton, deleteInfoButton, editInfoForm))
+                userForm.addEventListener('submit', () => saveEditData(userInfoElement, editInfoForm, editInfoButton, deleteInfoButton, event))
+
             })
         </script>
     <!-- Jquery -->

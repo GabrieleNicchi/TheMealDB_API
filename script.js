@@ -350,7 +350,7 @@ const updateFavMeal = (meal, button) => {
         if (isFavorite) {
             // Rimuovi il pasto dai preferiti
             utenteLoggato.pastiPreferiti = utenteLoggato.pastiPreferiti.filter(p => p.id !== meal.idMeal)
-            button.querySelector('img').src = 'img/heart.svg'; // Cambia l'icona
+            button.querySelector('img').src = 'img/heart.svg' // Cambia l'icona
         } else {
             // Aggiungi il pasto ai preferiti
             utenteLoggato.pastiPreferiti.push({ id: meal.idMeal, commento: '' })
@@ -440,15 +440,15 @@ const editNote = (idMeal, commento) => {
     `
 }
 
-const getFavMeal = () => {
+const getFavMeal = async () => {
 
-    try{
+    try {
         // Recupera l'utente loggato dal session storage
         const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
         const mealContainer = document.getElementById('meal-container')
 
         // Se l'utente non ha salvato alcun piatto
-        if(utenteLoggato.pastiPreferiti.length == 0){
+        if (utenteLoggato.pastiPreferiti.length === 0) {
             // Crea l'elemento per ogni pasto
             const mealElement = document.createElement('div')
             mealElement.classList.add('meal')
@@ -459,29 +459,28 @@ const getFavMeal = () => {
             `
             // Aggiungi ogni pasto al contenitore
             mealContainer.appendChild(mealElement)
+            return
         }
 
-        // Recupera tutti i pasti dal local storage
-        const meals = JSON.parse(localStorage.getItem('meals'))
         let dataMeals = []
 
         // Itera sui pasti preferiti dell'utente
         for (let i = 0; i < utenteLoggato.pastiPreferiti.length; i++) {
             const id = utenteLoggato.pastiPreferiti[i].id
-            // Cerca per ID del pasto
-            const meal = meals.find(meal => meal.idMeal === id)
-            if (meal) {
-                dataMeals.push(meal)
+            // Effettua la chiamata di rete per ottenere i dettagli del pasto
+            const response = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`)
+            const data = await response.json()
+            if (data.meals && data.meals.length > 0) {
+                dataMeals.push(data.meals[0])
             }
         }
 
         // Stampa i pasti preferiti
-        printMealPrefs(dataMeals, mealContainer )
+        printMealPrefs(dataMeals, mealContainer)
     } catch (error) {
         window.location.href = 'error.html'
-        console.log("Error in getFavMeal: " , error)
+        console.log("Error in getFavMeal: ", error)
     }
-    
 }
 
 // Funzione dei pasti preferiti del ricettario
@@ -696,6 +695,65 @@ const checkRegister = (username, email, password, paese) => {
     return isValid
 }
 
+const validateForm = () => {
+
+    const email = document.getElementById('email').value.trim()
+    const password = document.getElementById('password').value.trim()
+    const nomeUtente = document.getElementById('nome_utente').value.trim()
+    const paese = document.getElementById('paese').value.trim()
+    
+
+    let isValid = true
+
+    // Verifica che tutti i campi (tranne categoria) siano riempiti
+    if (!email) {
+        document.getElementById('errorMessageemail').innerText = "L'email è obbligatoria."
+        isValid = false
+    } else {
+        document.getElementById('errorMessageemail').innerText = ""
+    }
+
+    if (!password) {
+        document.getElementById('errorMessagepassword').innerText = "La password è obbligatoria."
+        isValid = false
+    } else {
+        document.getElementById('errorMessagepassword').innerText = ""
+    }
+
+    if (!nomeUtente) {
+        document.getElementById('errorMessagenome_utente').innerText = "Il nome utente è obbligatorio."
+        isValid = false;
+    } else {
+        document.getElementById('errorMessagenome_utente').innerText = ""
+    }
+
+    if (!paese) {
+        document.getElementById('errorMessagepaese').innerText = "Il paese è obbligatorio."
+        isValid = false;
+    } else {
+        document.getElementById('errorMessagepaese').innerText = ""
+    }
+
+    // Verifica che username e email siano unici
+    const utenti = JSON.parse(localStorage.getItem('utenti')) || []
+    const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+
+    const emailExists = utenti.some(u => u.email === email && u.email !== utenteLoggato.email)
+    const usernameExists = utenti.some(u => u.username === nomeUtente && u.username !== utenteLoggato.username)
+
+    if (emailExists) {
+        document.getElementById('errorMessageemail').innerText = "L'email è già in uso."
+        isValid = false;
+    }
+
+    if (usernameExists) {
+        document.getElementById('errorMessagenome_utente').innerText = "Il nome utente è già in uso."
+        isValid = false
+    }
+
+    return isValid
+}
+
 
 /* ------------------------------ PROFILO UTENTE ------------------------------ */
 
@@ -840,6 +898,107 @@ const checkUserLogged = () => {
      }
 }
 
+const fetchUserData = (userInfoElement) => {
+    
+        const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+        
+    
+
+        if (utenteLoggato) {
+            // Mostra i dati dell'utente loggato
+            userInfoElement.innerHTML = `
+                <p><img src="img/envelope-at-fill.svg" alt="Email Icon" width="24" height="24"> Email: ${utenteLoggato.email}</p>
+                <p><img src="img/incognito.svg" alt="Password Icon" width="24" height="24"> Password: ${utenteLoggato.password}</p>
+                <p><img src="img/person-vcard-fill.svg" alt="Username Icon" width="24" height="24"> Nome utente: ${utenteLoggato.username}</p>
+                <p><img src="img/geo-fill.svg" alt="Country Icon" width="24" height="24"> Paese: ${utenteLoggato.paese}</p>
+                <p><img src="img/egg-fried.svg" alt="Category Icon" width="24" height="24"> Categoria preferita: ${utenteLoggato.categoria}</p>
+            `
+
+            // Precompila il form con i dati dell'utente loggato
+            document.getElementById('email').value = utenteLoggato.email
+            document.getElementById('password').value = utenteLoggato.password
+            document.getElementById('nome_utente').value = utenteLoggato.username
+            document.getElementById('paese').value = utenteLoggato.paese
+            document.getElementById('categoria').value = utenteLoggato.categoria
+        }
+    
+}
+
+const showEditForm = (userInfoElement, editInfoButton, deleteInfoButton, editInfoForm) => {
+
+    userInfoElement.style.display = 'none'
+    editInfoButton.style.display = 'none'
+    deleteInfoButton.style.display = 'none'
+    editInfoForm.style.display = 'block'
+
+}
+
+const saveEditData = (userInfoElement, editInfoForm, editInfoButton, deleteInfoButton, event) => {
+    
+    event.preventDefault()
+
+    if (!validateForm()) {
+        return
+    }
+
+    try {
+
+        let utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+        let utenteLoggatoVecchioNome = utenteLoggato.username
+
+        // Aggiorna i dati dell'utente
+        utenteLoggato.email = document.getElementById('email').value
+        utenteLoggato.password = document.getElementById('password').value
+        utenteLoggato.username = document.getElementById('nome_utente').value
+        utenteLoggato.paese = document.getElementById('paese').value
+        utenteLoggato.categoria = document.getElementById('categoria').value
+
+        
+            // Aggiorna il SessionStorage
+            sessionStorage.setItem('utenteLoggato', JSON.stringify(utenteLoggato))
+
+            // Aggiorna il LocalStorage -> utenti
+            let utenti = JSON.parse(localStorage.getItem('utenti')) || []
+            let utenteIndex = utenti.findIndex(u => u.email === utenteLoggato.email)
+
+            if (utenteIndex !== -1) {
+                utenti[utenteIndex] = utenteLoggato
+                localStorage.setItem('utenti', JSON.stringify(utenti))
+            }
+
+            // Aggiorna il LocalStorage -> recensioni
+            let recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+
+            recensioni.forEach(recensione => {
+                recensione.valutazioni.forEach(valutazione => {
+                    if (valutazione.utente === utenteLoggatoVecchioNome) {
+                        valutazione.utente = utenteLoggato.username 
+                    }
+                })
+            })
+
+            // Salva le recensioni aggiornate
+            localStorage.setItem('recensioni', JSON.stringify(recensioni))
+
+            // Ricarica i dati aggiornati
+            fetchUserData(userInfoElement)
+
+            alert("Il tuo profilo è stato modificato con successo!!")
+
+            // Nascondi il form di modifica e mostra le informazioni aggiornate
+            editInfoForm.style.display = 'none'
+            userInfoElement.style.display = 'block'
+            editInfoButton.style.display = 'block'
+            deleteInfoButton.style.display = 'block'
+       
+        
+    } catch (error) {
+        console.log("saveEditData error: " , error)
+        window.location.href = 'error.html'
+    }
+    
+}
+
 /* ------------------------------ RECENSIONI ------------------------------ */
 
 class Recensione {
@@ -903,6 +1062,7 @@ const printReview = (id) => {
 
     recensioneHtml += `
         <button class="btn btn-light review-button">${hasReviewed ? 'Modifica recensione' : 'Lascia una recensione'}</button>
+        ${hasReviewed ? `<button class="btn btn-light review-button" onclick="deleteReview(${id})">Elimina recensione </button>` : ''}
         <div id="reviewContainer-${id}" style="display:none;">
             <textarea id="reviewText-${id}" rows="4" cols="50" placeholder="Scrivi la tua recensione qui..."></textarea><br>
             <div id="star-rating-gusto-${id}">
@@ -967,6 +1127,7 @@ const placeReview = (idMeal) => {
         document.getElementById('review-overlay').style.display = 'none'
         document.getElementById('review').innerHTML = printReview(idMeal)
         window.location.reload()
+        alert("Recensione inserita con successo!")
     } catch (error) {
         window.location.href = 'error.html'
         console.log("Error in placeReview: " , error) 
@@ -1006,7 +1167,7 @@ const editReview = (idMeal) => {
     try{
         const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
 
-        const commento = document.getElementById('overlay-reviewText').value;
+        const commento = document.getElementById('overlay-reviewText').value
         const rankGusto = parseFloat(document.getElementById('rating-value-gusto').textContent)
         const rankDifficolta = parseFloat(document.getElementById('rating-value-difficolta').textContent)
 
@@ -1021,12 +1182,12 @@ const editReview = (idMeal) => {
         let recensione = recensioni.find(review => review.idPasto === idMeal)
 
         if (recensione) {
-            recensione.modificaValutazione(utenteLoggato.username, rankGusto, rankDifficolta, commento);
+            recensione.modificaValutazione(utenteLoggato.username, rankGusto, rankDifficolta, commento)
             localStorage.setItem('recensioni', JSON.stringify(recensioni))
 
             document.getElementById('review-overlay').style.display = 'none'
             document.getElementById('review').innerHTML = printReview(idMeal)
-            window.location.reload();
+            window.location.reload()
         } else {
             console.error(`Recensione per il pasto con ID ${idMeal} non trovata.`)
         }
@@ -1035,6 +1196,45 @@ const editReview = (idMeal) => {
         console.log("Error in editReview: " , error) 
     }
     
+}
+
+const deleteReview = (idMeal) => {
+
+    try {
+        const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+
+        let recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+        
+        recensioni = recensioni.map(review => Object.assign(new Recensione(), review))
+
+       
+        idMeal = idMeal.toString()
+
+        let recensione = recensioni.find(review => review.idPasto === idMeal)
+        
+
+        if (recensione) {
+            // Filtra le valutazioni per rimuovere quella dell'utente loggato
+            recensione.valutazioni = recensione.valutazioni.filter(valutazione => valutazione.utente !== utenteLoggato.username)
+
+            // Se non ci sono più valutazioni per questo piatto, rimuovi la recensione
+            if (recensione.valutazioni.length === 0) {
+                recensioni = recensioni.filter(review => review.idPasto !== idMeal)
+            }
+
+            localStorage.setItem('recensioni', JSON.stringify(recensioni))
+
+            document.getElementById('review-overlay').style.display = 'none'
+            document.getElementById('review').innerHTML = printReview(idMeal)
+            window.location.reload()
+            alert("Recensione eliminata con successo!")
+        } else {
+            console.error(`Recensione per il pasto con ID ${idMeal} non trovata.`)
+        }
+    } catch (error) {
+        window.location.href = 'error.html'
+        console.log("Error in deleteReview: ", error)
+    }
 }
 
 function setupStarRating(starContainerId, ratingValueId) {
