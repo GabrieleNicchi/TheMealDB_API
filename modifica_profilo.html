@@ -88,6 +88,7 @@
 
                 editInfoButton.addEventListener('click', () => showEditForm(userInfoElement, editInfoButton, deleteInfoButton, editInfoForm))
                 userForm.addEventListener('submit', () => saveEditData(userInfoElement, editInfoForm, editInfoButton, deleteInfoButton, event))
+                deleteInfoButton.addEventListener('click' , () => deleteUser())
 
             })
         </script>

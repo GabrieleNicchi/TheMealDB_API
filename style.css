@@ -275,10 +275,6 @@
         margin: 1px;
     }
     
-    .star:hover,
-    .star:hover ~ .star {
-        content: url('star-fill.svg');
-    }
     
     .star.half::after {
         content: url('star-half.svg');

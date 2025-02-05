@@ -999,6 +999,45 @@ const saveEditData = (userInfoElement, editInfoForm, editInfoButton, deleteInfoB
     
 }
 
+const deleteUser = () => {
+
+    try {
+        const utenteLoggato = JSON.parse(sessionStorage.getItem('utenteLoggato'))
+        let utenti = JSON.parse(localStorage.getItem('utenti')) || []
+
+        // Trova l'utente loggato
+        const utenteIndex = utenti.findIndex(user => user.username === utenteLoggato.username)
+
+        if (utenteIndex !== -1) {
+            // Rimuovi l'utente dal LocalStorage
+            utenti.splice(utenteIndex, 1)
+            localStorage.setItem('utenti', JSON.stringify(utenti))
+
+            // Rimuovi l'utente dal SessionStorage
+            sessionStorage.removeItem('utenteLoggato')
+        }
+
+        // Cancella tutte le recensioni fatte dall'utente
+        let recensioni = JSON.parse(localStorage.getItem('recensioni')) || []
+        recensioni.forEach(recensione => {
+            recensione.valutazioni = recensione.valutazioni.filter(valutazione => valutazione.utente !== utenteLoggato.username)
+        })
+
+        // Rimuovi le recensioni che non hanno più valutazioni
+        recensioni = recensioni.filter(recensione => recensione.valutazioni.length > 0)
+
+        // Salva le recensioni aggiornate
+        localStorage.setItem('recensioni', JSON.stringify(recensioni))
+
+        alert("Il tuo profilo è stato eliminato con successo!")
+        window.location.href = 'index.html'
+
+    } catch (error) {
+        console.log("Errore in deleteUser: ", error)
+        window.location.href = 'error.html'
+    }
+}
+
 /* ------------------------------ RECENSIONI ------------------------------ */
 
 class Recensione {
@@ -1198,6 +1237,8 @@ const editReview = (idMeal) => {
     
 }
 
+// Rimuovo la recensione in un pasto
+
 const deleteReview = (idMeal) => {
 
     try {
@@ -1242,6 +1283,8 @@ function setupStarRating(starContainerId, ratingValueId) {
     const stars = document.querySelectorAll(`#${starContainerId} .star`)
     const ratingValue = document.getElementById(ratingValueId)
 
+    
+
     stars.forEach(star => {
         star.addEventListener('click', function(event) {
             // Ottieni il valore numerico della stella cliccata
@@ -1279,6 +1322,7 @@ function updateStars(stars, rating) {
             // Stella vuota
             star.src = 'img/star.svg'
         }
+        
     })
 }
 
