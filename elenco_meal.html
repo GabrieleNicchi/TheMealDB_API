@@ -149,35 +149,33 @@
             // Aggiorna il contenuto dell'elemento <h1> con il valore di execute
             document.getElementById('execute').textContent = execute
     
-            if(ricerca){
+            /*if(ricerca){
 
                 // Gestione in base al form di input (WEBSTORAGE)
                 getMealListStore(ricerca, name_param )
 
             } else {
                 //Errore
-            }
+            }*/
             
-
-
             // Gestione separata in base al form di input (API)
-            /*
+            
             if (ricerca) {
                 
                 // ------ NOME RICETTA ------
                 if (name_param == "meal") {
-                    getMealList(ricerca, mealContainer, 'search', 's')
+                    getMealList(ricerca, 'search', 's')
                 // ------ INGREDIENTE RICETTA ------
                 } else if (name_param == "ingredient") {
-                    getMealList(ricerca, mealContainer, 'filter', 'i')
+                    getMealList(ricerca, 'filter', 'i')
                 // ------ LETTERA INIZIALE RICETTA ------
                 } else if (name_param == "letter") {
-                    getMealList(ricerca, mealContainer, 'search', 'f')
+                    getMealList(ricerca, 'search', 'f')
                 }
             } else {
                 //Errore
             }
-            */
+            
         })
     </script>
 

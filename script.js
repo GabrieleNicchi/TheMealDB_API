@@ -21,7 +21,7 @@ const getQueryParamNames = () => {
 
 /* ------------------------------ WEB STORAGE ------------------------------ */
 
-const fetchAndStoreMealsByIdRange = async (startId, endId) => {
+/*const fetchAndStoreMealsByIdRange = async (startId, endId) => {
     let allMeals = []
 
     for (let id = startId; id <= endId; id++) {
@@ -127,19 +127,19 @@ const getMealDetailStore = (id) => {
         console.log("Error in getMealDetailStore")
     }
     
-}
+}*/
 
 /* ------------------------------ ELENCO MEAL ------------------------------ */
 
-/*
+
 // Funzione generale per ottenere l'elenco dei pasti
-const getMealList = ( ricerca , mealContainer , type, ref) => {
+const getMealList = ( ricerca , type, ref) => {
 
     fetch('https://www.themealdb.com/api/json/v1/1/' + type + '.php?' + ref + '=' + ricerca)
     .then(response => response.json())
     .then(data => {
     
-    
+    const mealContainer = document.getElementById('meal-container')
     // Cancella il contenuto precedente una sola volta, prima del ciclo
     mealContainer.innerHTML = ''
 
@@ -155,7 +155,7 @@ const getMealList = ( ricerca , mealContainer , type, ref) => {
     }).catch(error => console.error('Error fetching meal data:', error))
 
 }
-*/
+
 // Funzione di stampa dei pasti
 const printMeal = (data_meal, mealContainer) => {
 
@@ -194,7 +194,7 @@ const printMeal = (data_meal, mealContainer) => {
 
 /* ------------------------------ MEAL DETTAGLI ------------------------------ */
 
-/*
+
 // Funzione generale per ottenere i dettagli di un pasto
 const getDetailMealList = ( id ) => {
 
@@ -202,7 +202,7 @@ const getDetailMealList = ( id ) => {
     .then(response => response.json())
     .then(data => {
     
-    const mealContainer = document.getElementById('meal-container')
+    const mealContainer = document.getElementById('meal-detail')
     
     // Cancella il contenuto precedente una sola volta, prima del ciclo
     mealContainer.innerHTML = ''
@@ -217,7 +217,7 @@ const getDetailMealList = ( id ) => {
     }
     }).catch(error => console.error('Error fetching meal data:', error))
 }
-*/
+
 
 // Funzione di stampa di un pasto
 const printDetailMeal = (meal, mealContainer) => {

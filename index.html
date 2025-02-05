@@ -137,16 +137,7 @@
     })
 
     document.addEventListener("DOMContentLoaded", function() {
-        const loadingScreen = document.getElementById('loading-screen')
-        loadingScreen.style.display = 'flex'
-    
-        fetchAndStoreMealsByIdRange(52764, 53085).then(() => {
-            console.log('Dati scaricati e memorizzati con successo.')
-            loadingScreen.style.display = 'none'
-        }).catch(error => {
-            console.error('Errore durante il download dei dati:', error)
-            loadingScreen.style.display = 'none'
-        })
+        
 
         checkUserLogged()
 
