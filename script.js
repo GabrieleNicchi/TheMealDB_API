@@ -431,6 +431,7 @@ const saveNote = (idMeal, commento) => {
 }
 
 const editNote = (idMeal, commento) => {
+    
     const noteContainer = document.querySelector(`#noteContainer-${idMeal}`)
     noteContainer.innerHTML = `
         <div class="noteArea">
@@ -743,7 +744,7 @@ const validateForm = () => {
 
     if (emailExists) {
         document.getElementById('errorMessageemail').innerText = "L'email è già in uso."
-        isValid = false;
+        isValid = false
     }
 
     if (usernameExists) {
@@ -1238,7 +1239,6 @@ const editReview = (idMeal) => {
 }
 
 // Rimuovo la recensione in un pasto
-
 const deleteReview = (idMeal) => {
 
     try {
@@ -1309,6 +1309,7 @@ function setupStarRating(starContainerId, ratingValueId) {
 }
 
 function updateStars(stars, rating) {
+
     stars.forEach(star => {
         const value = parseFloat(star.getAttribute('data-value'))
 
@@ -1327,6 +1328,7 @@ function updateStars(stars, rating) {
 }
 
 function generateStars(rating) {
+
     let starsHtml = ''
     for (let i = 1; i <= 5; i++) {
         if (i <= rating) {
