@@ -787,8 +787,8 @@ class Utente {
 
 class PastiPreferiti {
     constructor(id, commento) {
-        this.id = id; // ID del pasto
-        this.commento = commento; // Possibile commento al pasto
+        this.id = id
+        this.commento = commento
     }
 }
 
